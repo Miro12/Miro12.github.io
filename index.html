@@ -62,6 +62,84 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Django" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/20/Django/" class="article-date">
+  <time datetime="2018-06-20T09:49:16.000Z" itemprop="datePublished">2018-06-20</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/06/20/Django/">Django</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h5 id="关于migrations"><a href="#关于migrations" class="headerlink" title="关于migrations"></a>关于migrations</h5><ul>
+<li>自从上次drop掉一个表后 我就掉进了一个坑 好不容易爬出来了-。-</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ python manage.py migrate –fake pay zero</span><br><span class="line">之后，删除当前app的migrations的文件，仅保留__init__.py</span><br><span class="line">并且要去当前app所属数据库的django_migrations里删除当前app的记录（忘记是不是必须的了）</span><br><span class="line">$ python manage.py makemigration app_name</span><br><span class="line">python manage.py migrate --databaese xxx_db –fake-inital </span><br><span class="line">问题的关键是 一定要--database 指明当前app的database</span><br><span class="line">不然 嗯 django_migrations的记录就是写在default数据库里 然后以后怎么migrate都没有用！！！</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/06/20/Django/" data-id="cjinvyhdy0001nguqxdw9n9mr" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Mysql" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/20/Mysql/" class="article-date">
+  <time datetime="2018-06-20T08:00:00.000Z" itemprop="datePublished">2018-06-20</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/06/20/Mysql/">Mysql</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h5 id="csv与mysql的导入导出"><a href="#csv与mysql的导入导出" class="headerlink" title="csv与mysql的导入导出"></a>csv与mysql的导入导出</h5><ul>
+<li>csv导入mysql数据库</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*- </span></span><br><span class="line"><span class="comment"># 需要pip install pymysql，sqlalchem，pandas</span></span><br><span class="line">import pandas as pd </span><br><span class="line">from sqlalchemy import create_engin</span><br><span class="line">engine = create_engine(<span class="string">'mysql+pymysql://root:147369@localhost:3306/xxx?charset=utf8'</span>) </span><br><span class="line"><span class="comment">#防止中文乱码</span></span><br><span class="line">df = pd.read_csv(<span class="string">"xxx.csv"</span>, sep=<span class="string">','</span>) </span><br><span class="line">df.to_sql(<span class="string">'xxx'</span>, engine, if_exists = <span class="string">'append'</span>,index= False)</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/06/20/Mysql/" data-id="cjinvyhds0000nguqotoa9e51" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-first-test" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/06/19/first-test/" class="article-date">
@@ -92,12 +170,12 @@
 <h5 id="发现神器hexo-admin"><a href="#发现神器hexo-admin" class="headerlink" title="发现神器hexo-admin"></a>发现神器hexo-admin</h5><ul>
 <li>其中admin的用户密码配置</li>
 </ul>
-<p>听说可以实时的？？?????????</p>
+<p>听说可以实时的?<br>在哪里okkkkk</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/19/first-test/" data-id="cjilhz87j0001rcuq9ucui5xv" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/06/19/first-test/" data-id="cjili7ahq00010wuq3feampkn" class="article-share-link">Share</a>
       
       
     </footer>
@@ -142,7 +220,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/06/19/hello-world/" data-id="cjilhz87c0000rcuq651qoih6" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/06/19/hello-world/" data-id="cjili7ahl00000wuqdcd47v4o" class="article-share-link">Share</a>
       
       
     </footer>
@@ -181,6 +259,14 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2018/06/20/Django/">Django</a>
+          </li>
+        
+          <li>
+            <a href="/2018/06/20/Mysql/">Mysql</a>
+          </li>
         
           <li>
             <a href="/2018/06/19/first-test/">first_test</a>
