@@ -159,179 +159,71 @@
           <div id="js-content" class="content-ll">
             
   
-    <article id="post-Django" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-ocker搭建hadoop-spark跨主机集群-1" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2018/06/20/Django/">Django</a>
+      <a class="article-title" href="/2019/09/25/ocker搭建hadoop-spark跨主机集群-1/">docker搭建hadoop/spark跨主机集群</a>
     </h1>
   
 
         
-        <a href="/2018/06/20/Django/" class="archive-article-date">
-  	<time datetime="2018-06-20T09:49:16.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-06-20</time>
+        <a href="/2019/09/25/ocker搭建hadoop-spark跨主机集群-1/" class="archive-article-date">
+  	<time datetime="2019-09-25T09:36:51.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-25</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h5 id="关于migrations"><a href="#关于migrations" class="headerlink" title="关于migrations"></a>关于migrations</h5><ul>
-<li>自从上次drop掉一个表后 我就掉进了一个坑 好不容易爬出来了-。-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ python manage.py migrate –fake pay zero</span><br><span class="line">之后，删除当前app的migrations的文件，仅保留__init__.py</span><br><span class="line">并且要去当前app所属数据库的django_migrations里删除当前app的记录（忘记是不是必须的了）</span><br><span class="line">$ python manage.py makemigration app_name</span><br><span class="line">python manage.py migrate --databaese xxx_db –fake-inital </span><br><span class="line">问题的关键是 一定要--database 指明当前app的database</span><br><span class="line">不然 嗯 django_migrations的记录就是写在default数据库里 然后以后怎么migrate都没有用！！！</span><br></pre></td></tr></table></figure>
-      
+        <h6 id="1-生成基础镜像-image"><a href="#1-生成基础镜像-image" class="headerlink" title="1.生成基础镜像(image)"></a>1.生成基础镜像(image)</h6><p>在Dockerfile当前文件夹下执行 docker build –no-cache -t {image_name} .</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build --no-cache -t  datanode4:base-spark2.4.4-hadoop2.7.1-java .</span><br></pre></td></tr></table></figure>
+<h6 id="step2-编辑docker-compose-yml"><a href="#step2-编辑docker-compose-yml" class="headerlink" title="step2: 编辑docker-compose.yml"></a>step2: 编辑docker-compose.yml</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">```</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">### hadoop集群</span><br><span class="line">- docker-compose 配置</span><br><span class="line"></span><br><span class="line">经典参考：使用docker-compose创建hadoop集群</span><br><span class="line">#https://cloud.tencent.com/developer/article/1150829</span><br><span class="line"></span><br><span class="line">登录namenode</span><br><span class="line">查看mapreduce工具包</span><br><span class="line">cd /opt/hadoop-2.7.1</span><br><span class="line">hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.jar (包含wordcount)</span><br><span class="line"></span><br><span class="line">- 测试wordcout例子</span><br></pre></td></tr></table></figure>
+<p>$ mkdir input1<br>$ cd input1<br>$ echo “Hello hadoop , I’m xiao ming” &gt; f1.txt<br>$ echo “Hello world , I’m zhao ming ming” &gt; f2.txt<br>$ cat f1.txt f2.txt<br>$ cd /usr/local/hadoop<br>$ hadoop fs -mkdir /input1<br>$ hadoop fs -put input1/f<em>.txt /input1<br>$ hadoop fs -ls /input1<br>$ cd /opt/hadoop-2.7.1<br>$ hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.jar wordcount /input1/ /output1/<br>查看结果<br>$ hadoop fs -cat /output/</em></p>
+<p>#来源<a href="https://blog.csdn.net/GreatMichael001/article/details/72466974" target="_blank" rel="noopener">https://blog.csdn.net/GreatMichael001/article/details/72466974</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- 测试计算π</span><br><span class="line"></span><br><span class="line">#### weave</span><br><span class="line"></span><br><span class="line">- 安装weave</span><br></pre></td></tr></table></figure></p>
+<p>curl -L git.io/weave -o /usr/local/bin/weave  #下载<br>chmod a+x /usr/local/bin/weave  #赋予执行权限<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">- weave基本命令</span><br></pre></td></tr></table></figure></p>
+<p>weave version   #查看weave版本<br>weave status     #查看weave状态<br>weave status connections #查看连接log<br>weave ps 查看ip<br>weave reset<br>weave launch   #启动weave<br> weave attatch containerid #即不指定ip（最好这样指定报错-。-）<br> 用 weave launch 10.101.100.1 替换 weave launch、weave connect 10.101.100.1<br> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">链接https://www.jianshu.com/p/512f742f3250</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#### Hive</span><br><span class="line"></span><br><span class="line">- 安装MySQL</span><br><span class="line"></span><br><span class="line">使用MySQL作为远程元数据库，部署在master节点上</span><br></pre></td></tr></table></figure></p>
+<p>#安装mysql<br>sudo apt-get install mysql-server</p>
+<p>开启MySQL远程访问</p>
+<p>#sudo vim /etc/mysql/my.cnf<br>vim /etc/mysql/mysql.conf.d</p>
+<p>找到bind-address=127.0.0.1 ,把这一行注释掉</p>
+<p>重启MySQL<br>sudo service mysql restart</p>
+<p>#启动 service mysql start</p>
+<p>建立Hive用户<br>mysql -u root -p</p>
+<p>mysql&gt;GRANT ALL PRIVILEGES ON <em>.</em> TO ‘hive‘@’namenode’ IDENTIFIED BY ‘hive’ WITH GRANT OPTION;<br>mysql&gt;flush privileges;<br>1<br>2<br>在namenode节点上用“hive”用户和“namenode”host登录mysql，密码为“hive”</p>
+<p>$ mysql -h master -u hive -p<br>1<br>如果能访问，则说明远程MySql服务已经开启<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">#https://blog.csdn.net/predict_wise/article/details/51984100</span><br><span class="line"></span><br><span class="line">- 下载hive</span><br><span class="line">ENV HIVE_VERSION 2.3.6</span><br><span class="line">cd /opt \</span><br><span class="line">&amp;&amp; wget http://www.apache.org/dist/hive/hive-$HIVE-VERSION/apache-hive-$HIVE-VERSION-bin.tar.gz \</span><br><span class="line">    &amp;&amp; tar -zxvf apache-hive-$HIVE-VERSION-bin.tar.gz</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">- Hive配置</span><br><span class="line"></span><br><span class="line">配置环境变量</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#for hive</span><br><span class="line">vim ~/.bashrc</span><br><span class="line">export HIVE_HOME=/opt/apache-hive-2.3.6-bin</span><br><span class="line">export PATH=$HIVE_HOME/bin:$PATH</span><br><span class="line">使环境变量生效</span><br><span class="line">source ~/.bashrc</span><br><span class="line"></span><br><span class="line">解压apache-hive-2.1.0-bin.tar.gz 到 /opt 目录下</span><br><span class="line"></span><br><span class="line">赋予权限</span><br><span class="line">sudo chown -R wlw:wlw /opt/apache-hive-2.1.0-bin</span><br><span class="line"></span><br><span class="line">修改 conf/ 下的几个template模板并重命名</span><br><span class="line">cp hive-env.sh.template hive-env.sh</span><br><span class="line">cp hive-default.xml.template hive-site.xml</span><br><span class="line"></span><br><span class="line">修改 conf/hive-env.sh 文件</span><br><span class="line">修改 conf/hive-site.xml 文件</span><br></pre></td></tr></table></figure></p>
+<p>sed -i ‘/<name>javax.jdo.option.ConnectionURL&lt;\/name&gt;/!b;n;c\ \ \ \ <value>jdbc:mysql://namenode:3306/hive?createDatabaseIfNotExist=true</value>‘ hive-site.xml</name></p>
+<p>sed -i ‘/<name>javax.jdo.option.ConnectionDriverName&lt;\/name&gt;/!b;n;c\ \ \ \<value>com.mysql.jdbc.Driver</value>‘ hive-site.xml</name></p>
+<p>sed -i ‘/<name>javax.jdo.option.ConnectionUserName&lt;\/name&gt;/!b;n;c\ \ \ \<value>hive</value>‘ hive-site.xml</name></p>
+<p>sed -i ‘/<name>javax.jdo.option.ConnectionPassword&lt;\/name&gt;/!b;n;c\ \ \ \<value>hive</value>‘ hive-site.xml</name></p>
+<p>sed -i ‘/<name>hive.exec.local.scratchdir&lt;\/name&gt;/!b;n;c\ \ \ \<value>/opt/apache-hive-2.3.6-bin/iotmp</value>‘ hive-site.xml</name></p>
+<p>sed -i ‘/<name>hive.downloaded.resources.dir&lt;\/name&gt;/!b;n;c\ \ \ \<value>/opt/apache-hive-2.3.6-bin/iotmp</value>‘ hive-site.xml<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">根据hive-site-xml，创建缓存目录</span><br><span class="line">cd /opt/apache-hive-2.3.6-bin</span><br><span class="line">mkdir iotmp</span><br><span class="line">修改 bin/hive-config.sh 文件</span><br><span class="line">echo &apos;export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64&apos; &gt;&gt; hive-config.sh</span><br><span class="line">echo &apos;export HIVE_HOME=/opt/apache-hive-2.3.6-bin&apos; &gt;&gt; hive-config.sh</span><br><span class="line">echo &apos;export HADOOP_HOME=/opt/hadoop-2.7.1&apos; &gt;&gt; hive-config.sh</span><br><span class="line">下载mysql-connector-java-6.0.6-bin.jar文件，并放到/opt/apache-hive-2.3.6-bin/lib目录下</span><br><span class="line">wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/6.0.6/mysql-connector-java-6.0.6.jar</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">slave端配置, 修改 conf/hive-site.xml 文件</span><br><span class="line">sed -i &apos;/&lt;name&gt;hive.metastore.uris&lt;\/name&gt;/!b;n;c\ \ \ \&lt;value&gt;thrift://testname:9083&lt;/value&gt;&apos; hive-site.xml</span><br><span class="line">    </span><br><span class="line">- hive测试</span><br><span class="line"></span><br><span class="line">hadoop fs -put ..hive_test.txt   /user/input</span><br><span class="line"></span><br><span class="line">）创建hive_test表</span><br><span class="line"></span><br><span class="line">hive&gt; create table easyhive_5_1_1(id int);</span><br><span class="line">https://blog.csdn.net/predict_wise/article/details/51984100</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">- 报错</span><br><span class="line"></span><br><span class="line">1.</span><br></pre></td></tr></table></figure></name></p>
+<p>cp /opt/hadoop-2.7.1/share/hadoop/yarn/lib/jersey-client-1.9.jar /opt/spark-2.4.4-bin-hadoop2.7/jars</p>
+<p>cp /opt/hadoop-2.7.1/share/hadoop/yarn/lib/jersey-core-1.9.jar /opt/spark-2.4.4-bin-hadoop2.7/jars</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#https://my.oschina.net/xiaozhublog/blog/737902</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">2。 spark on yarn(ERROR client.TransportClient: Failed to send RPC)</span><br><span class="line"></span><br><span class="line">vim /opt/hadoop-2.7.1/etc/hadoop/yarn-site.xml</span><br></pre></td></tr></table></figure>
+<property><br>    <name>yarn.nodemanager.pmem-check-enabled</name><br>    <value>false</value><br></property>
 
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2018/06/20/Django/">戳开戳开 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-Mysql" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/06/20/Mysql/">Mysql</a>
-    </h1>
-  
-
-        
-        <a href="/2018/06/20/Mysql/" class="archive-article-date">
-  	<time datetime="2018-06-20T08:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-06-20</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h5 id="csv与mysql的导入导出"><a href="#csv与mysql的导入导出" class="headerlink" title="csv与mysql的导入导出"></a>csv与mysql的导入导出</h5><ul>
-<li>csv导入mysql数据库</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*- </span></span><br><span class="line"><span class="comment"># 需要pip install pymysql，sqlalchem，pandas</span></span><br><span class="line">import pandas as pd </span><br><span class="line">from sqlalchemy import create_engin</span><br><span class="line">engine = create_engine(<span class="string">'mysql+pymysql://root:147369@localhost:3306/xxx?charset=utf8'</span>) </span><br><span class="line"><span class="comment">#防止中文乱码</span></span><br><span class="line">df = pd.read_csv(<span class="string">"xxx.csv"</span>, sep=<span class="string">','</span>) </span><br><span class="line">df.to_sql(<span class="string">'xxx'</span>, engine, if_exists = <span class="string">'append'</span>,index= False)</span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2018/06/20/Mysql/">戳开戳开 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-first-test" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/06/19/first-test/">first_test</a>
-    </h1>
-  
-
-        
-        <a href="/2018/06/19/first-test/" class="archive-article-date">
-  	<time datetime="2018-06-19T07:53:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-06-19</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>不知道说啥啊<br>暂时记录一下啊</p>
-<h5 id="hexo在win10的安装"><a href="#hexo在win10的安装" class="headerlink" title="hexo在win10的安装"></a>hexo在win10的安装</h5><p>（其实我也不想用的但是又不想带自己电脑）</p>
+<p><property><br>    <name>yarn.nodemanager.vmem-check-enabled</name><br>    <value>false</value><br></property></p>
+<p>#<a href="https://www.cnblogs.com/pojishou/p/6358588.html" target="_blank" rel="noopener">https://www.cnblogs.com/pojishou/p/6358588.html</a><br><code>`</code></p>
 <ul>
-<li>安装好node.js/git bash 后<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ npm install -g hexo</span><br><span class="line">建立hexo文件夹 右键git bash</span><br><span class="line">$ hexo init</span><br><span class="line">安装依赖包</span><br><span class="line">$ npm install</span><br><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-</li>
+<li>tips</li>
+</ul>
+<p>终端不能输入中文！！！<br>sudo docker exec -it datanode1 env LANG=C.UTF-8 bash<br>或者在docker-compose.yml 配置<br>environment:</p>
+<ul>
+<li>LANG=zh_CN.UTF-8</li>
+<li>TZ=Asia/Shanghai<br><a href="https://blog.51cto.com/10814168/2167794" target="_blank" rel="noopener">https://blog.51cto.com/10814168/2167794</a></li>
 </ul>
 <ul>
-<li><p>部署到github</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ npm install hexo-deployer-git –save </span><br><span class="line">编辑\hexo下的_config.yml，修改Deployment部分：</span><br><span class="line">deploy:</span><br><span class="line">  type: git</span><br><span class="line">  repository: https://github.com/Miro12/Miro12.github.io.git</span><br><span class="line">  branch: master</span><br></pre></td></tr></table></figure>
+<li><p>测试</p>
 </li>
-<li><p>跟github连接的话，要配置github</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git --config global.name xxx</span><br><span class="line">cd ~/.ssh</span><br><span class="line">ssh genkey</span><br><span class="line">复制id_rsa.pu内容到github的ssh</span><br></pre></td></tr></table></figure>
-</li>
+<li></li>
 </ul>
-<h5 id="更换hexo主题"><a href="#更换hexo主题" class="headerlink" title="更换hexo主题"></a>更换hexo主题</h5>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git clone https://github.com/litten/hexo-theme-yilia.git themes/yilia</span><br></pre></td></tr></table></figure>
-<h5 id="发现神器hexo-admin"><a href="#发现神器hexo-admin" class="headerlink" title="发现神器hexo-admin"></a>发现神器hexo-admin</h5><ul>
-<li><p>安装hexo-admin</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm install --save hexo-admin</span><br><span class="line">hexo server -d</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>在hexo的_config.yml配置hexo-admin</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">admin: username: xxx 			</span><br><span class="line">password_hash:be121740bf988b2225a313fa1f107ca1 </span><br><span class="line">secret: xxx </span><br><span class="line">deployCommand: &apos;./admin_script/hexo-generate.sh&apos;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
+<p>提交修改后的image<br>docker commit -a “jiayin.li” -m “1.cp jersey;2.vim yarn-site.xml” add37f6861e7  datanode1:cpu-spark2.4.4-hadoop2.7.1-java8</p>
+<p>清理坏死块<br>hdfs fsck -delete</p>
+<p>！使用 Docker 网络解决方案 weave 遇到的那些坑<br><a href="https://xiaozhuanlan.com/topic/2097315486" target="_blank" rel="noopener">https://xiaozhuanlan.com/topic/2097315486</a></p>
 
       
 
@@ -340,22 +232,11 @@
     <div class="article-info article-info-index">
       
       
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">hexo</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
       
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2018/06/19/first-test/">戳开戳开 >></a>
+          <a class="article-more-a" href="/2019/09/25/ocker搭建hadoop-spark跨主机集群-1/">戳开戳开 >></a>
         </p>
       
 
@@ -385,35 +266,59 @@
 
 
   
-    <article id="post-hello-world" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-开源分布式存储系统" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2018/06/19/hello-world/">Hello World</a>
+      <a class="article-title" href="/2019/08/01/开源分布式存储系统/">开源分布式存储系统</a>
     </h1>
   
 
         
-        <a href="/2018/06/19/hello-world/" class="archive-article-date">
-  	<time datetime="2018-06-19T07:26:58.010Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-06-19</time>
+        <a href="/2019/08/01/开源分布式存储系统/" class="archive-article-date">
+  	<time datetime="2019-08-01T05:47:48.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-01</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+        <h4 id="HADOOP简析"><a href="#HADOOP简析" class="headerlink" title="HADOOP简析"></a>HADOOP简析</h4><ul>
+<li>HDFS</li>
+</ul>
+<p>总结：Java语言，与平台无关，采用强一致性协议，支持多副本，支持EC（3.0才支持？），本地优先的策略；采用固定大小的切片（默认是128M），默认三副本，扩容与缩容需要手动调用命令执行<br>有standby问题。</p>
+<p>#<a href="https://zhuanlan.zhihu.com/p/52500301" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/52500301</a></p>
+<ul>
+<li>HDFS的NameNode架构原理</li>
+</ul>
+<p>每次Active NameNode（主节点）修改一次元数据都会生成一条edits log，除了写入本地磁盘文件，还会写入JournalNodes集群。<br>然后Standby NameNode就可以从JournalNodes集群拉取edits log，应用到自己内存的文件目录树里，跟Active NameNode保持一致。<br>然后每隔一段时间，Standby NameNode都把自己内存里的文件目录树写一份到磁盘上的fsimage，这可不是日志，这是完整的一份元数据。这个操作就是所谓的checkpoint检查点操作。<br>然后把这个fsimage上传到到Active NameNode，接着清空掉Active NameNode的旧的edits log文件，这里可能都有100万行修改日志了！<br>然后Active NameNode继续接收修改元数据的请求，再写入edits log，写了一小会儿，这里可能就几十行修改日志而已！<br>如果说此时，Active NameNode重启了，bingo！没关系，只要把Standby NameNode传过来的fsimage直接读到内存里，这个fsimage直接就是元数据，不需要做任何额外操作，纯读取，效率很高！</p>
+<p>#<a href="https://cloud.tencent.com/developer/news/368266" target="_blank" rel="noopener">https://cloud.tencent.com/developer/news/368266</a></p>
+<h4 id="GlusterFS"><a href="#GlusterFS" class="headerlink" title="GlusterFS"></a>GlusterFS</h4><p>卷存储</p>
+<p>#<a href="https://blog.csdn.net/xuguokun1986/article/details/71693769" target="_blank" rel="noopener">https://blog.csdn.net/xuguokun1986/article/details/71693769</a></p>
+<p><img src="/images/pasted-59.png" alt="upload successful"></p>
+<p>(3) replica volume 复制卷<br>文件同步复制到多个 brick 上，文件级 RAID1，具有容错能力，写性能下降，读性能提升。Replicated 模式，也称作 AFR（Auto File Replication），相当于 RAID1，即同一文件在多个镜像存储节点上保存多份，每个 replicated 子节点有着相同的目录结构和文件，replica volume 也是在容器存储中较为推崇的一种</p>
+<p><img src="/images/pasted-60.png" alt="upload successful"></p>
+<ul>
+<li>glusterfs替换hadoop</li>
+</ul>
+<p><a href="https://github.com/gluster/glusterfs-hadoop/wiki" target="_blank" rel="noopener">https://github.com/gluster/glusterfs-hadoop/wiki</a></p>
+<h4 id="Ceph"><a href="#Ceph" class="headerlink" title="Ceph"></a>Ceph</h4><ul>
+<li>Docker Swarm 集群 使用ceph做存储配置</li>
+</ul>
+<h4 id="一些链接"><a href="#一些链接" class="headerlink" title="一些链接"></a>一些链接</h4><ul>
+<li>Setup Highly Available applications with Docker Swarm and Gluster</li>
+</ul>
+<p>#<a href="https://medium.com/running-a-software-factory/setup-3-node-high-availability-cluster-with-glusterfs-and-docker-swarm-b4ff80c6b5c3" target="_blank" rel="noopener">https://medium.com/running-a-software-factory/setup-3-node-high-availability-cluster-with-glusterfs-and-docker-swarm-b4ff80c6b5c3</a></p>
+<h3 id="安装hadoop"><a href="#安装hadoop" class="headerlink" title="安装hadoop"></a>安装hadoop</h3><ul>
+<li><p>安装openjdk-8-jdk</p>
+</li>
+<li><p>安装hadoop2.7.1</p>
+</li>
+</ul>
+<p>下载 wget <a href="https://archive.apache.org/dist/hadoop/core/hadoop-2.7.1/hadoop-2.7.1.tar.gz" target="_blank" rel="noopener">https://archive.apache.org/dist/hadoop/core/hadoop-2.7.1/hadoop-2.7.1.tar.gz</a></p>
 
       
 
@@ -426,7 +331,7 @@
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2018/06/19/hello-world/">戳开戳开 >></a>
+          <a class="article-more-a" href="/2019/08/01/开源分布式存储系统/">戳开戳开 >></a>
         </p>
       
 
@@ -456,6 +361,1058 @@
 
 
   
+    <article id="post-Apache-Arrow" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/07/22/Apache-Arrow/">学习</a>
+    </h1>
+  
+
+        
+        <a href="/2019/07/22/Apache-Arrow/" class="archive-article-date">
+  	<time datetime="2019-07-22T09:06:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-22</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h5 id="1-From-Bag-of-Words-to-Transformers-10-Years-of-Practical-Natural-Language-Processing"><a href="#1-From-Bag-of-Words-to-Transformers-10-Years-of-Practical-Natural-Language-Processing" class="headerlink" title="1.From Bag of Words to Transformers: 10 Years of Practical Natural Language Processing"></a>1.From Bag of Words to Transformers: 10 Years of Practical Natural Language Processing</h5><p>#<a href="https://medium.com/@Zelros/from-bag-of-words-to-transformers-10-years-of-practical-natural-language-processing-8ccc238f679a" target="_blank" rel="noopener">https://medium.com/@Zelros/from-bag-of-words-to-transformers-10-years-of-practical-natural-language-processing-8ccc238f679a</a></p>
+<ul>
+<li><p>Until 2016: the reign of bag of words and TF-IDF<br>利用词袋（统计某个word在整篇doc中出现的次数），作为feature，feed i进分类模型（如传统的贝叶斯）。一个轻微的细化就是TF-IDF。</p>
+</li>
+<li><p>2016–2019: the rise of word embeddings + Keras and Tensorflow<br>开始可以获取sequence中的意义。</p>
+</li>
+<li><p>2018–2019: the PyTorch breakthrough</p>
+</li>
+<li><p>2019: the birth of transformers and pretrained language models</p>
+</li>
+</ul>
+<p>word embeddings 总是需要先去学习句子的meaning，</p>
+<h5 id="2-放弃幻想，全面拥抱Transformer：自然语言处理三大特征抽取器（CNN-RNN-TF）比较"><a href="#2-放弃幻想，全面拥抱Transformer：自然语言处理三大特征抽取器（CNN-RNN-TF）比较" class="headerlink" title="2.放弃幻想，全面拥抱Transformer：自然语言处理三大特征抽取器（CNN/RNN/TF）比较"></a>2.放弃幻想，全面拥抱Transformer：自然语言处理三大特征抽取器（CNN/RNN/TF）比较</h5>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/07/22/Apache-Arrow/">戳开戳开 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-rapids" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/07/15/rapids/">rapids</a>
+    </h1>
+  
+
+        
+        <a href="/2019/07/15/rapids/" class="archive-article-date">
+  	<time datetime="2019-07-15T07:22:21.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><ul>
+<li>RAPIDS aims to accelerate the entire data science pipeline including data loading, ETL, model training, and inference. </li>
+<li>RAPIDS also includes support for multi-node, multi-GPU deployments, enabling scaling up and out on much larger dataset sizes.</li>
+<li>RAPIDS构建于Apache Arrow、Pandas、Sklearn等流行的开源项目之上，将数据处理和分析、机器学习全部联通在一个管道上，从而带来CPU提速。</li>
+<li>RAPIDS使得在深度学习中使用表列数据成为可能。</li>
+</ul>
+<h4 id="docker安装"><a href="#docker安装" class="headerlink" title="docker安装"></a>docker安装</h4><ul>
+<li>拉取镜像</li>
+<li>编写docker-compose file</li>
+</ul>
+<h4 id="dbscan例子"><a href="#dbscan例子" class="headerlink" title="dbscan例子"></a>dbscan例子</h4><ul>
+<li>numpy高阶数组的索引<br>import numpy as np  </li>
+</ul>
+<p>arr2d = np.array([[1,2,3],[4,5,6],[7,8,9]])<br>print(arr2d[:2,1:]) </p>
+<ul>
+<li><p>查看cuda版本<br>nvcc –version</p>
+</li>
+<li><p>显卡对cuda版本的兼容<br>#<a href="https://docs.nvidia.com/deploy/cuda-compatibility/" target="_blank" rel="noopener">https://docs.nvidia.com/deploy/cuda-compatibility/</a><br>不同版本的CUDA對顯卡的“compute capability”有一定的要求<br>查看gpu版本信息 nvidia-smi -p<br>GeForce GTX TITAN X<br>5.2<br>根据<a href="https://www.twblogs.net/a/5baaa0262b7177781a0e5578/" target="_blank" rel="noopener">https://www.twblogs.net/a/5baaa0262b7177781a0e5578/</a><br>cuda 9.2 mincc 5.2&gt;3.0</p>
+</li>
+</ul>
+<p>排除驱动程序原因，查看显卡驱动版本<br>cat /proc/driver/nvidia/version</p>
+<p>#<a href="https://blog.csdn.net/feilianwangshu/article/details/82830902" target="_blank" rel="noopener">https://blog.csdn.net/feilianwangshu/article/details/82830902</a></p>
+<p>cuda-gdb:进入debug模式<br>cuda-memcheck python test.py<br>尝试了各种方法,有可能的影响因素（看清前提）</p>
+<ul>
+<li>Prerequisites</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">NVIDIA Pascalâ„¢ GPU architecture or better</span><br><span class="line">CUDA 9.2 or 10.0 compatible NVIDIA driver 检查驱动</span><br><span class="line">Ubuntu 16.04/18.04 or CentOS 7</span><br><span class="line">Docker CE v18+</span><br><span class="line">nvidia-docker v2+</span><br><span class="line">实验机器为GeForce GTX Titan X，为maxwell架构，低于Pascal！！！</span><br><span class="line">our focus has been on Pascal and newer architecture.</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">不是 -gencode arch=compute_50,code=sm_50 \这些的编译问题，及其本身架构不符合。</span><br><span class="line">cmake /usr/local/cuda 编译</span><br><span class="line">vim CMakeLists.txt</span><br><span class="line">	find_package(CUDA)</span><br><span class="line"> 	cmake_minimum_required(VERSION 3.12)</span><br><span class="line">	set(CUDA_NVCC_FLAGS -gencode arch=compute_52,code=compute_52;-G;-g)</span><br></pre></td></tr></table></figure>
+<h5 id="作死记录"><a href="#作死记录" class="headerlink" title="作死记录"></a>作死记录</h5><ul>
+<li><p>第一台机器的gpu不符合要求（maxwell架构），换了台Pascal的gpu driver版本太低（390），为了升级安装了cuda（可以把驱动也更新）。结果下好后，nvidia-smi命令用不了。没有选择第一方案重启电脑（sudo reboot -h now），尝试了第二种方案没用，最后还是重启好了-。-  </p>
+</li>
+<li><p>安装cuda   #<a href="https://stackoverflow.com/questions/43022843/nvidia-nvml-driver-library-version-mismatch" target="_blank" rel="noopener">https://stackoverflow.com/questions/43022843/nvidia-nvml-driver-library-version-mismatch</a></p>
+</li>
+</ul>
+<h4 id="资料"><a href="#资料" class="headerlink" title="资料"></a>资料</h4><ul>
+<li><p>CORLA<br><a href="https://www.jianshu.com/p/000d2a9d36a0" target="_blank" rel="noopener">https://www.jianshu.com/p/000d2a9d36a0</a><br>-<a href="https://medium.com/rapids-ai" target="_blank" rel="noopener">https://medium.com/rapids-ai</a></p>
+</li>
+<li><p>fast.ai</p>
+</li>
+</ul>
+<p>one-hot encoding<br>categorical-embeddings(Embeddings for Categorical Variables)<br><a href="https://www.fast.ai/2018/04/29/categorical-embeddings/?source=post_page---------------------------" target="_blank" rel="noopener">https://www.fast.ai/2018/04/29/categorical-embeddings/?source=post_page---------------------------</a></p>
+<h4 id="pytorch"><a href="#pytorch" class="headerlink" title="+pytorch"></a>+pytorch</h4><ul>
+<li>pytorch ignite<br><a href="https://cloud.tencent.com/developer/article/1143543" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1143543</a></li>
+</ul>
+<h5 id="cudf"><a href="#cudf" class="headerlink" title="cudf"></a>cudf</h5><p><a href="https://rapidsai.github.io/projects/cudf/en/latest/index.html" target="_blank" rel="noopener">https://rapidsai.github.io/projects/cudf/en/latest/index.html</a></p>
+<ul>
+<li>开启rapids容器</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">docker run --runtime=nvidia -d -v /home/hadoop/jyli/rapids/notebooks-extended:/rapids/notebooks/notebooks-extended --name test1 -it -p 8888:8888 -p 8787:8787 -p 8786:8786 rapidsai/rapidsai:cuda9.2-devel-ubuntu16.04</span><br></pre></td></tr></table></figure>
+<ul>
+<li>基本操作</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line">- 创建df</span><br><span class="line">df = cudf.DataFrame()</span><br><span class="line">df[&apos;value&apos;] = np.arange(10, 15)</span><br><span class="line"># use tuple</span><br><span class="line">df = cudf.DataFrame([(&apos;id&apos;, ids), (&apos;timestamp&apos;, timestamps_np)])</span><br><span class="line"># use dict</span><br><span class="line">df = cudf.DataFrame(&#123;&apos;id&apos;: ids, &apos;timestamp&apos;: timestamps_np&#125;)</span><br><span class="line">gdf = cudf.DataFrame.from_pandas(df)</span><br><span class="line"># Series</span><br><span class="line">column3 = cudf.Series([9, 10, 11, 12])</span><br><span class="line">df = cudf.DataFrame(&#123;&apos;c&apos;: column3&#125;)</span><br><span class="line">gdf.dtypes</span><br><span class="line"></span><br><span class="line">- 切片</span><br><span class="line">gdf = gdf.loc[:, column_names] #选取列</span><br><span class="line">gdf.loc[:splitpoint] #选取行</span><br><span class="line">print(gdf.head(5))</span><br><span class="line">gdf[&apos;PERWT&apos;] = gdf[&apos;PERWT&apos;].astype(np.float64) #转换类型</span><br><span class="line"></span><br><span class="line">- 使用自定义函数applymap</span><br><span class="line"></span><br><span class="line">def adjust_incearn(incearn):</span><br><span class="line">    return adjust * incearn;</span><br><span class="line">apply it to the &apos;population&apos; column</span><br><span class="line">gdf[&apos;INCEARN&apos;] = gdf[&apos;INCEARN&apos;].applymap(adjust_incearn)</span><br><span class="line"></span><br><span class="line">- 去掉列，取平均</span><br><span class="line">##drop the ADJUST column</span><br><span class="line">gdf.drop_column(&apos;ADJUST&apos;)</span><br><span class="line">new_df = df.drop([&apos;a&apos;, &apos;b&apos;])</span><br><span class="line">##compute the mean</span><br><span class="line">gdf[&apos;INCEARN&apos;].mean()</span><br><span class="line"></span><br><span class="line">gdf = gdf.sort_values(by=&apos;INCEARN&apos;, ascending=True)</span><br><span class="line">gdf = gdf.reset_index()</span><br><span class="line">df[&apos;a&apos;].value_counts()</span><br><span class="line">cudf.concat([df1, df2], axis=0)</span><br><span class="line"></span><br><span class="line">- join/merge</span><br><span class="line">df = cudf.merge(df1, df2, on=[&apos;a&apos;, &apos;b&apos;]</span><br><span class="line"></span><br><span class="line">- groupby</span><br><span class="line">df.groupby(&apos;a&apos;).sum()</span><br><span class="line"></span><br><span class="line">- 区别</span><br><span class="line"></span><br><span class="line"># filter out</span><br><span class="line">gdf = gdf.query(&apos;INCEARN &gt;= 0&apos;)</span><br><span class="line"></span><br><span class="line">- unique_k </span><br><span class="line">计算uniqie值，最多为k个。len（）为unique值得个数。</span><br><span class="line"> df[k].unique_k(k=1000) 否则报错</span><br><span class="line">资料 https://devblogs.nvidia.com/goai-open-gpu-accelerated-data-analytics/</span><br><span class="line">pandas中使用，nunique()计算。</span><br><span class="line"></span><br><span class="line">- one_hot</span><br><span class="line"></span><br><span class="line">pandas中，</span><br><span class="line">.cat.codes ：分类的编码，用数字表示分类数据</span><br><span class="line">.cat.categories：分的类别</span><br><span class="line">cudf中，</span><br><span class="line">gdf = gdf.one_hot_encoding(k, prefix=k, cats=cats)</span><br><span class="line">del gdf[k] #删除列</span><br><span class="line"></span><br><span class="line">- </span><br><span class="line">.as_gpu_matrix(columns=gdf.columns[1:]),</span><br></pre></td></tr></table></figure>
+<ul>
+<li>cuml</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">np.random.normal(loc=0, scale=1, size) #正态分布</span><br><span class="line">inputs = np.linspace(start=-5, stop=5, num=1000)#等差数列</span><br><span class="line">np.expand_dims(inputs, 1) 在1位置添加数据</span><br><span class="line">np.shape shape[0]表示最外围的数组的维数，shape[1]表示次外围的数组的维数，数字不断增大，维数由外到内。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">import cuml; print(&apos;cuML Version:&apos;, cuml.__version__)</span><br><span class="line">from cuml.linear_model import LinearRegression as LinearRegression_GPU</span><br><span class="line"></span><br><span class="line">linear_regression_gpu = LinearRegression_GPU()</span><br><span class="line">%%time</span><br><span class="line">linear_regression_gpu.fit(df[[&apos;x&apos;]], df[&apos;y&apos;])</span><br><span class="line"># create new data and perform inference</span><br><span class="line">new_data_df = cudf.DataFrame(&#123;&apos;inputs&apos;: inputs&#125;)</span><br><span class="line">outputs_gpu = linear_regression_gpu.predict(new_data_df[[&apos;inputs&apos;]])</span><br></pre></td></tr></table></figure>
+<ul>
+<li>dask-cudf</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">-dask</span><br><span class="line"></span><br><span class="line">对于大型数据集，Dask 的高级集合可以取代 NumPy 和 Pandas。</span><br><span class="line">%%time</span><br><span class="line"></span><br><span class="line">from dask.delayed import delayed</span><br><span class="line"># define delayed execution graph</span><br><span class="line">sleep_operations = [delayed(sleep_1)() for _ in range(n_workers)]</span><br><span class="line"></span><br><span class="line"># use client to perform computations using execution graph</span><br><span class="line">sleep_futures = client.compute(sleep_operations, optimize_graph=False, fifo_timeout=&quot;0ms&quot;)</span><br><span class="line"></span><br><span class="line"># collect and print results</span><br><span class="line">sleep_results = client.gather(sleep_futures)</span><br><span class="line">print(sleep_results)</span><br><span class="line"></span><br><span class="line">import dask; print(&apos;Dask Version:&apos;, dask.__version__)</span><br><span class="line">from dask.distributed import Client, LocalCluster</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 创建关闭create a local cluster with 4 workers</span><br><span class="line">n_workers = 4</span><br><span class="line">cluster = LocalCluster(n_workers=n_workers)</span><br><span class="line">client = Client(cluster)</span><br><span class="line">client.close()</span><br><span class="line">cluster.close()</span><br></pre></td></tr></table></figure>
+<p>#<a href="https://juejin.im/post/5c1feeaf5188257f9242b65c" target="_blank" rel="noopener">https://juejin.im/post/5c1feeaf5188257f9242b65c</a><br>dask基本操作#<a href="https://blog.csdn.net/mydear_11000/article/details/81232423" target="_blank" rel="noopener">https://blog.csdn.net/mydear_11000/article/details/81232423</a></p>
+<ul>
+<li>dask-cudf</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> dask_cudf; print(<span class="string">'Dask cuDF Version:'</span>, dask_cudf.__version__)</span><br><span class="line"><span class="keyword">from</span> dask_cuda <span class="keyword">import</span> LocalCUDACluster</span><br><span class="line">cluster = LocalCUDACluster()</span><br><span class="line"><span class="comment">#cluster = LocalCUDACluster(ip=IPADDR, scheduler_port=8786, diagnostics_port=8787)</span></span><br><span class="line">client = Client(cluster)</span><br><span class="line"></span><br><span class="line"><span class="comment"># identify number of workers</span></span><br><span class="line">workers = client.has_what().keys()</span><br><span class="line">n_workers = len(workers)</span><br><span class="line"></span><br><span class="line"><span class="comment"># create a cuDF DataFrame with two columns named "key" and "value"</span></span><br><span class="line">df = cudf.DataFrame()</span><br><span class="line">n_rows = <span class="number">100000000</span>  <span class="comment"># let's process 100 million rows in a distributed parallel fashion</span></span><br><span class="line">df[<span class="string">'key'</span>] = np.random.binomial(<span class="number">1</span>, <span class="number">0.2</span>, size=(n_rows))</span><br><span class="line">df[<span class="string">'value'</span>] = np.random.normal(size=(n_rows))</span><br><span class="line"></span><br><span class="line"><span class="comment"># create a distributed cuDF DataFrame using Dask</span></span><br><span class="line">distributed_df = dask_cudf.from_cudf(df, npartitions=n_workers)</span><br><span class="line">aggregation = distributed_df[<span class="string">'value'</span>].sum()</span><br><span class="line">print(aggregation.compute())</span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/07/15/rapids/">戳开戳开 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-docker" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/07/05/docker/">docker</a>
+    </h1>
+  
+
+        
+        <a href="/2019/07/05/docker/" class="archive-article-date">
+  	<time datetime="2019-07-05T08:39:54.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-05</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="win10下的docker"><a href="#win10下的docker" class="headerlink" title="win10下的docker"></a>win10下的docker</h4><ul>
+<li>在windows10家庭版上，配置docker<br>来自 <a href="https://blog.csdn.net/lanlanaln/article/details/78955808" target="_blank" rel="noopener">https://blog.csdn.net/lanlanaln/article/details/78955808</a><br>Windows 10家庭版安装Docker<br>#<a href="https://www.jianshu.com/p/feeb15f2e49b" target="_blank" rel="noopener">https://www.jianshu.com/p/feeb15f2e49b</a> </li>
+</ul>
+<ul>
+<li>在win10家庭版使用docker</li>
+</ul>
+<p>用ssh登录<br>ssh <a href="mailto:docker@192.168.99.100" target="_blank" rel="noopener">docker@192.168.99.100</a><br>密码 tcuser</p>
+<ul>
+<li>网络问题： Get <a href="https://registry-1.docker.io/v2/" target="_blank" rel="noopener">https://registry-1.docker.io/v2/</a>: net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers).太神奇了啊啊啊！</li>
+</ul>
+<p>解决<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ docker-machine restart default      # Restart the environment</span><br><span class="line">$ eval $(docker-machine env default)  # Refresh your environment settings</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>挂载问题</li>
+</ul>
+<p>windows 10的权限要求高，不能容许软件自行共享文件夹。</p>
+<h4 id="docker-应用"><a href="#docker-应用" class="headerlink" title="docker 应用"></a>docker 应用</h4><ul>
+<li>使用docker制作hexo镜像<br>#<a href="https://blog.csdn.net/u013051748/article/details/53991558" target="_blank" rel="noopener">https://blog.csdn.net/u013051748/article/details/53991558</a> </li>
+</ul>
+<p>把hexo放到docker上# <a href="https://segmentfault.com/a/1190000008833278" target="_blank" rel="noopener">https://segmentfault.com/a/1190000008833278</a> </p>
+<h4 id="使用已定制好的镜像"><a href="#使用已定制好的镜像" class="headerlink" title="使用已定制好的镜像"></a>使用已定制好的镜像</h4><ul>
+<li>pyspark-notebook </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git clone -b all_merged https://github.com/keineahnung2345/docker-blog-example.git</span><br><span class="line">sudo docker-compose up</span><br><span class="line">直接访问localhost:8888</span><br></pre></td></tr></table></figure>
+<p>#<a href="https://hub.docker.com/r/jupyter/pyspark-notebook" target="_blank" rel="noopener">https://hub.docker.com/r/jupyter/pyspark-notebook</a></p>
+<h4 id="docker-与-docker-compose"><a href="#docker-与-docker-compose" class="headerlink" title="docker 与 docker compose"></a>docker 与 docker compose</h4><ul>
+<li>非docker compose 版本：</li>
+</ul>
+<p>每个image已经设置好参数<br><a href="https://github.com/kiwenlau/hadoop-cluster-docker" target="_blank" rel="noopener">https://github.com/kiwenlau/hadoop-cluster-docker</a></p>
+<ul>
+<li>docker compose 版本</li>
+</ul>
+<p>仅指定路径，统一在yaml中设置，便于管理</p>
+<h4 id="hadoop集群"><a href="#hadoop集群" class="headerlink" title="hadoop集群"></a>hadoop集群</h4><ul>
+<li>docker-compose 配置</li>
+</ul>
+<p>#<a href="https://cloud.tencent.com/developer/article/1150829" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1150829</a></p>
+<ul>
+<li>登录namenode</li>
+<li>查看mapreduce工具包</li>
+</ul>
+<p>cd /opt/hadoop-2.7.1<br>hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.jar (包含wordcount)</p>
+<ul>
+<li>测试wordcout例子<br><a href="https://blog.csdn.net/GreatMichael001/article/details/72466974" target="_blank" rel="noopener">https://blog.csdn.net/GreatMichael001/article/details/72466974</a></li>
+</ul>
+<h4 id="spark集群"><a href="#spark集群" class="headerlink" title="spark集群"></a>spark集群</h4><h4 id="rapids-使用"><a href="#rapids-使用" class="headerlink" title="rapids 使用"></a>rapids 使用</h4><ul>
+<li>pull 镜像</li>
+</ul>
+<p>docker pull rapidsai/rapidsai:cuda9.2-runtime-ubuntu16.04</p>
+<p>#<a href="https://hub.docker.com/r/rapidsai/rapidsai" target="_blank" rel="noopener">https://hub.docker.com/r/rapidsai/rapidsai</a></p>
+<ul>
+<li>改写docker命令<br>安装docker-compose</li>
+</ul>
+<p>挂载 /rapids/notebooks/cuml/data</p>
+<h4 id="docker-命令"><a href="#docker-命令" class="headerlink" title="docker 命令"></a>docker 命令</h4><ul>
+<li>登录容器开启终端<br><code>sudo docker exec -it namenode /bin/bash</code></li>
+<li><p>需要在docker-compose.yml中设置container_name,才能用容器名登录。</p>
+</li>
+<li><p>删除docker image</p>
+</li>
+</ul>
+<p>docker rmi xx</p>
+<ul>
+<li>查看docker 挂载情况</li>
+</ul>
+<p>docker volume ls</p>
+<ul>
+<li>docker save/export 镜像、容器</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">保存image</span><br><span class="line">docker save imageID &gt; filename</span><br><span class="line"># lost tag name，则需要docker tag &#123;imageid&#125; repositary:tag</span><br><span class="line">docker save -o xxx.tar repositary:tag</span><br><span class="line">#keep tag name</span><br><span class="line">-导出image</span><br><span class="line">docker load &lt; filename</span><br><span class="line">#https://blog.csdn.net/renhanchi/article/details/75898857</span><br></pre></td></tr></table></figure>
+<h4 id="docker-compose"><a href="#docker-compose" class="headerlink" title="docker-compose"></a>docker-compose</h4><ul>
+<li>关于volumes，即路径挂载</li>
+</ul>
+<p>###关于named volumn<br>查看docker 挂在情况 docker volume ls<br>查看具体情况 docker inspect volumename<br>sudo cd 报错<br>sudo -s 再cd</p>
+<ul>
+<li><p>docker-compose.yml </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">version: &apos;2.3&apos;</span><br><span class="line">services:</span><br><span class="line">    rapidsai:</span><br><span class="line">        ports:</span><br><span class="line">            - &apos;8888:8888&apos;</span><br><span class="line">            - &apos;8787:8787&apos;</span><br><span class="line">            - &apos;8786:8786&apos;</span><br><span class="line">        image: rapidsai/rapidsai:cuda9.2-runtime-ubuntu16.04</span><br><span class="line">        runtime: nvidia</span><br><span class="line">        container_name: rapidsai</span><br><span class="line">        tty: true //???</span><br><span class="line">        command: utils/start-jupyter.sh</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>tty的作用<br>#<a href="https://blog.csdn.net/boling_cavalry/article/details/79050451" target="_blank" rel="noopener">https://blog.csdn.net/boling_cavalry/article/details/79050451</a></p>
+</li>
+</ul>
+<h4 id="docker命令-gt-docker-compose"><a href="#docker命令-gt-docker-compose" class="headerlink" title="docker命令-&gt;docker-compose"></a>docker命令-&gt;docker-compose</h4><p><a href="https://composerize.com/" target="_blank" rel="noopener">https://composerize.com/</a></p>
+<h4 id="安装docker"><a href="#安装docker" class="headerlink" title="安装docker"></a>安装docker</h4><ul>
+<li>检查内核<br>uname -r ，需要&gt;3.10</li>
+<li><p>查看docker 版本</p>
+</li>
+<li><p>安装<br>sudo yum install docker-ce-3:18.09.6-3.el7  docker-ce-cli-3:18.09.6-3.el7  containerd.io<br>sudo yum install docker-ce-&lt;VERSION_STRING&gt; docker-ce-cli-&lt;VERSION_STRING&gt; containerd.io<br>sudo apt install docker.io</p>
+</li>
+<li><p>拉取image<br>docker pull bde2020/hadoop-namenode:1.1.0-hadoop2.7.1-java8</p>
+</li>
+<li><p>启动容器</p>
+</li>
+</ul>
+<p>sudo docker run -d -it -h master –name master bde2020/hadoop-namenode:1.1.0-hadoop2.7.1-java8 /bin/bash</p>
+<p>加/bin/bash 有一个可执行进程则容器不会自动退出</p>
+<ul>
+<li><p>启动<br>sudo systemctl start docker<br>#<a href="https://blog.csdn.net/weixin_34000916/article/details/91317697" target="_blank" rel="noopener">https://blog.csdn.net/weixin_34000916/article/details/91317697</a></p>
+</li>
+<li><p>保存image</p>
+</li>
+</ul>
+<p>hadoop-datanode:1.1.0-hadoop2.7.1-java8<br>docker commit 容器id 新image名（jyli/hadoop-datanode:1.1.0-hadoop2.7.1-java8）</p>
+<h4 id="安装nvidia-docker"><a href="#安装nvidia-docker" class="headerlink" title="安装nvidia-docker"></a>安装nvidia-docker</h4><ul>
+<li>查找源<br>yum list nvidia-docker2 –showduplicates | sort -r</li>
+</ul>
+<h4 id="hadoop集群-1"><a href="#hadoop集群-1" class="headerlink" title="hadoop集群"></a>hadoop集群</h4><p>此docker中，hadoop在/opt/hadoop2.7.1/</p>
+<ul>
+<li><p>安装docker-compose<br>curl “<a href="https://bootstrap.pypa.io/get-pip.py&quot;" target="_blank" rel="noopener">https://bootstrap.pypa.io/get-pip.py&quot;</a> -o “get-pip.py”<br>python get-pip.py<br>sudo pip install docker-compose</p>
+</li>
+<li><p>安装weave</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">curl -L git.io/weave -o /usr/local/bin/weave  #下载</span><br><span class="line">chmod a+x /usr/local/bin/weave  #赋予执行权限</span><br><span class="line">  </span><br><span class="line">weave version   #查看weave版本</span><br><span class="line">weave status     #查看weave状态</span><br><span class="line">weave status connections #查看连接log</span><br><span class="line">weave ps 查看ip</span><br><span class="line">   </span><br><span class="line">weave reset</span><br><span class="line"> weave launch   #启动weave</span><br><span class="line"> weave attatch containerid #即不指定ip（最好这样指定报错-。-）</span><br><span class="line"> 用 weave launch 10.101.100.1 替换 weave launch、weave connect 10.101.100.1</span><br></pre></td></tr></table></figure>
+<p>链接<a href="https://www.jianshu.com/p/512f742f3250" target="_blank" rel="noopener">https://www.jianshu.com/p/512f742f3250</a></p>
+<ul>
+<li>启动namenode，datanode容器</li>
+</ul>
+<p>安装vim<br>修改/etc/hosts,加入ip及hostname，如10.32.0.1 namenode<br>修改haddop文件夹下的/etc/hadoop/slaves</p>
+<ul>
+<li><p>java home 设置<br><a href="https://blog.csdn.net/chun19920827/article/details/74924434" target="_blank" rel="noopener">https://blog.csdn.net/chun19920827/article/details/74924434</a><br>检查 java –version<br>export 查看<br>在hadoop-env.sh中，再显示地重新声明一遍JAVA_HOME<br>JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/</p>
+</li>
+<li><p>配置ssh免密码登录</p>
+</li>
+</ul>
+<p>生成密钥<br>ssh-keygen -t rsa -P ‘’ -f ~/.ssh/id_rsa<br>cat ~/.ssh/id_rsa.pub &gt;&gt; ~/.ssh/authorized_keys<br>同时，把~/.ssh/id_dsa.pub的内容追加到需要登录的机器的~/.ssh/authorized_keys<br>让连接新主机时，不进行公钥确认？<br>修改 /etc/ssh/ssh_config 文件<br>添加StrictHostKeyChecking no</p>
+<p>#<a href="https://www.cnblogs.com/blitheG/p/7603322.html" target="_blank" rel="noopener">https://www.cnblogs.com/blitheG/p/7603322.html</a></p>
+<ul>
+<li><p>可能问题：dtaanode 识别namenode<br><a href="https://blog.csdn.net/lengxiao1993/article/details/20253035" target="_blank" rel="noopener">https://blog.csdn.net/lengxiao1993/article/details/20253035</a></p>
+</li>
+<li><p>entrypoint</p>
+</li>
+</ul>
+<p>sudo docker run -it –entrypoint /bin/bash -d –name namenode2 bde2020/hadoop-namenode:1.1.0-hadoop2.7.1-java8</p>
+<ul>
+<li>批量修改文件 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">sed -i &apos;1i 10.36.0.0 datanode1\n10.36.0.1 datanode2\n10.32.0.1 namenode&apos;  /etc/hosts </span><br><span class="line">在文本首行追加内容 ，-i即保存到文件 否则仅输出到控制台</span><br><span class="line">在docker中失效</span><br><span class="line"></span><br><span class="line">#解决 </span><br><span class="line"></span><br><span class="line">echo &quot;$(sed &apos;1i 10.36.0.0 datanode1\n10.36.0.1 datanode2\n10.32.0.1 namenode&apos;  /etc/hosts)&quot; &gt;/etc/hosts</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">即可实现替换。</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><a href="https://xuxinkun.github.io/2017/07/03/docker-sed-cannot-rename/" target="_blank" rel="noopener">https://xuxinkun.github.io/2017/07/03/docker-sed-cannot-rename/</a></p>
+<ul>
+<li>查看集群状态</li>
+</ul>
+<p>hdfs fsck /</p>
+<ul>
+<li>docker私有仓库搭建</li>
+</ul>
+<p><a href="https://segmentfault.com/a/1190000017955885" target="_blank" rel="noopener">https://segmentfault.com/a/1190000017955885</a></p>
+<ul>
+<li>datanode无法启动<br><a href="https://blog.csdn.net/baidu_16757561/article/details/53698746" target="_blank" rel="noopener">https://blog.csdn.net/baidu_16757561/article/details/53698746</a></li>
+</ul>
+<ul>
+<li>往容器、etc/hosts 添加主机名<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">extra_hosts:</span><br><span class="line"> - &quot;somehost:162.242.195.82&quot;</span><br><span class="line"> - &quot;otherhost:50.31.209.229&quot;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<ul>
+<li><p>举例</p>
+<p>hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.jar pi 5 10</p>
+<p>查看 yarn application -list<br>hadoop job -list 查看 Job 信息<br>查看报错信息：yarn logs -applicationId application_1544766080243_0018</p>
+<p>The auxService:mapreduce_shuffle does not exist問題解決-</p>
+<p>使用yarn模式<br><a href="https://blog.csdn.net/haoyuexihuai/article/details/52973867" target="_blank" rel="noopener">https://blog.csdn.net/haoyuexihuai/article/details/52973867</a><br>设置reduce 的获取数据的方式，yarn-site.xml<br>指定 ResourceManager 的位置：（可选项，在哪台机器上运行，默认的就<br>是哪台机器） ，yarn-site.xml</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;property&gt;&lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;&lt;value&gt;mapreduce_shuffle&lt;/value&gt;&lt;/property&gt;</span><br><span class="line">&lt;property&gt;&lt;name&gt;yarn.nodemanager.aux-services.mapreduce_shuffle.class&lt;/name&gt;&lt;value&gt;org.apache.hadoop.mapred.ShuffleHandler&lt;/value&gt;&lt;/property&gt;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>配置mapred-site.xml<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;property&gt;&lt;name&gt;mapreduce.framework.name&lt;/name&gt;&lt;value&gt;yarn&lt;/value&gt;&lt;/property&gt;</span><br></pre></td></tr></table></figure></p>
+<p>/bin/bash: /bin/java: No such file or directory<br>解决：<br>yarn-env.sh:<br>export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/</p>
+<p>hdfs namenode -format<br>hdfs fsck /</p>
+<p>在nameniode启动<br> sbin/yarn-daemon.sh stot proxyserver<br> 启动历史server<br>sbin/mr-jobhistory-daemon.sh start historyserver<br>配置<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;property&gt;&lt;name&gt;mapreduce.jobhistory.address&lt;/name&gt;&lt;value&gt;resourcemanager:50020&lt;/value&gt;&lt;/property&gt;</span><br><span class="line">&lt;property&gt;&lt;name&gt;mapreduce.jobhistory.webapp.address&lt;/name&gt;&lt;value&gt;resourcemanager:19888&lt;/value&gt;&lt;/property&gt;</span><br><span class="line">&lt;property&gt;&lt;name&gt;mapreduce.jobhistory.intermediate-done-dir&lt;/name&gt;&lt;value&gt;/mr-history/tmp&lt;/value&gt;&lt;/property&gt;</span><br><span class="line">&lt;property&gt;&lt;name&gt;mapreduce.jobhistory.done-dir&lt;/name&gt;&lt;value&gt;/mr-history/done&lt;/value&gt;&lt;/property&gt;</span><br><span class="line"></span><br><span class="line">&lt;property&gt;&lt;name&gt;mapreduce.jobhistory.bind-host&lt;/name&gt;&lt;value&gt;0.0.0.0&lt;/value&gt;&lt;/property&gt;</span><br><span class="line">&lt;property&gt;&lt;name&gt;mapreduce.jobhistory.hostname&lt;/name&gt;&lt;value&gt;resourcemanager&lt;/value&gt;&lt;/property&gt;</span><br></pre></td></tr></table></figure></p>
+<p><a href="https://blog.csdn.net/xiaoduan_/article/details/79689882" target="_blank" rel="noopener">https://blog.csdn.net/xiaoduan_/article/details/79689882</a></p>
+<p>常见错误<a href="https://www.jianshu.com/p/5359f9ebfb18" target="_blank" rel="noopener">https://www.jianshu.com/p/5359f9ebfb18</a></p>
+<p>启动proxyserver</p>
+<p>在不建立端口映射的情况下看到所有页面<br><a href="https://www.jianshu.com/p/04f1922acc8b" target="_blank" rel="noopener">https://www.jianshu.com/p/04f1922acc8b</a><br>端口转发？？Rinetd<br><a href="https://www.hi-linux.com/posts/29683.html" target="_blank" rel="noopener">https://www.hi-linux.com/posts/29683.html</a></p>
+<h4 id="spark"><a href="#spark" class="headerlink" title="spark"></a>spark</h4><ul>
+<li>安装scala</li>
+</ul>
+<p>2.12.10<br>$wget <a href="https://downloads.lightbend.com/scala/2.12.10/scala-2.11.12.tgz" target="_blank" rel="noopener">https://downloads.lightbend.com/scala/2.12.10/scala-2.11.12.tgz</a><br>$ tar -zxvf scala-2.12.10.tgz<br>ln -s /opt/scala-2.12./etc/scala /etc/scala</p>
+<p>mv scala-2.10.4 scala #重命名scala-2.10.4文件（也可忽略，注意修改环境变量时的命名即可）<br>$ sudo vim ~/.bashrc　　　#修改环境变量<br>添加内容：<br>export PATH=$PATH:/home/ubuntu/workspace/scala/bin<br>注意把路径换成你自己的安装路径。<br>$ source ~/.bashrc #生效环境变量<br>$ scala -version　　#验证 scala 是否安装成功，如果打印出如下版本信息，则说明安装成功</p>
+<ul>
+<li>下载spark</li>
+</ul>
+<p>进入官方下载地址下载Spark。我下载的是 spark-2.4.4-bin-hadoop2.7.tgz。<br>ENV SPARK_VERSION 2.4.4<br>RUN cd /opt<br>$ wget <a href="http://mirror-hk.koddos.net/apache/spark/spark-2.4.4/spark-2.4.4-bin-hadoop2.7.tgz" target="_blank" rel="noopener">http://mirror-hk.koddos.net/apache/spark/spark-2.4.4/spark-2.4.4-bin-hadoop2.7.tgz</a></p>
+<p>$ tar -zxvf spark-$SPARK_VERSION-bin-hadoop2.7.tgz<br>    ln -s /opt/spark-$SPARK_VERSION-bin-hadoop2.7/etc/spark /etc/spark<br>ENV PATH $spark-$SPARK_VERSION-bin-hadoop2.7/bin/:$PATH<br>！tar报错可能是压缩包损坏</p>
+<ul>
+<li><p>系统临时声明变量<br>export LD_LIBRARY_PATH=$HADOOP_HOME/lib/native</p>
+</li>
+<li><p>配置spark-env.sh</p>
+</li>
+<li><p>启动spark<br>sbin/start-all.sh<br>sbin/start-history-server.sh脚本启动</p>
+</li>
+<li><p>有用链接</p>
+</li>
+</ul>
+<p><a href="https://blog.csdn.net/qq_40343117/article/details/100974950" target="_blank" rel="noopener">https://blog.csdn.net/qq_40343117/article/details/100974950</a></p>
+<ul>
+<li>运行中的docker配置端口映射（添加／删除）</li>
+</ul>
+<p><a href="https://blog.csdn.net/weixin_37773766/article/details/80741770" target="_blank" rel="noopener">https://blog.csdn.net/weixin_37773766/article/details/80741770</a></p>
+<p>！添加</p>
+<p>a, 获取容器ip<br>    docker inspect $container_name | grep IPAddress<br>b. 添加转发规则<br>    iptables -t nat -A DOCKER -p tcp –dport $host_port -j DNAT –to-destination $docker_ip:$docker_port<br>    a. 获取规则编号<br>    iptables -t nat -nL –line-number<br>b. 根据编号删除规则<br>    iptables -t nat -D DOCKER $num<br>！！取消</p>
+<ul>
+<li><p>查看容器历史<br>docker logs -f -t –tail</p>
+</li>
+<li><p>配置远程登录container</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/ssh/ssh_config </span><br><span class="line">修改   StrictHostKeyChecking=no</span><br><span class="line">设置pem，把目标主机的~/.ssh/id_rsa 复制到pem中,chmod 600 xx.pem</span><br><span class="line">登录 ssh -i key3.pem root@10.37.0.1</span><br><span class="line"></span><br><span class="line">带私钥传文件</span><br><span class="line">scp  -i key1.pem -r ssh_env.sh  root@10.35.0.1:/</span><br></pre></td></tr></table></figure>
+<h5 id="整理"><a href="#整理" class="headerlink" title="整理"></a>整理</h5><ul>
+<li>生成base-spark2.4.4-hadoop2.7.7-java8的镜像<br>在当前Dockerfile文件下build</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build --no-cache -t namenode: base-spark2.4.4-hadoop2.7.7-java8 .</span><br></pre></td></tr></table></figure>
+<ul>
+<li>编辑 docker-compose.yml<br>如namenode</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">version: &quot;2&quot;</span><br><span class="line"></span><br><span class="line">services:</span><br><span class="line">  namenode:</span><br><span class="line">    image: namenode:base-spark2.4.4-hadoop2.7.1-java8</span><br><span class="line">    container_name: namenode</span><br><span class="line">    extra_hosts:</span><br><span class="line">      - &quot;namenode:10.32.0.1&quot;</span><br><span class="line">      - &quot;datanode1:10.35.0.1&quot;</span><br><span class="line">      - &quot;datanode2:10.36.0.1&quot;</span><br><span class="line">      - &quot;historyserver:10.32.0.1&quot;</span><br><span class="line">      - &quot;resourcemanager:10.32.0.1&quot;</span><br><span class="line">      - &quot;datanode3:10.37.0.1&quot;</span><br><span class="line">    hostname: namenode</span><br><span class="line">    entrypoint: bash -c &quot;./entrypoint.sh &amp;&amp; /etc/init.d/ssh start &amp;&amp; tail -f /dev/null&quot;</span><br><span class="line">    tty: true</span><br><span class="line">    ports:</span><br><span class="line">    - &quot;9999:50070&quot;</span><br><span class="line">    - &quot;8088:8088&quot;</span><br><span class="line">    - &quot;19888:19888&quot;</span><br><span class="line">    - &quot;10020:10020&quot;</span><br><span class="line">    - &quot;8188:8188&quot;</span><br><span class="line">    - &quot;8020:8020&quot;</span><br><span class="line">    - &quot;8080:8080&quot;</span><br><span class="line">    - &quot;4040:4040&quot;</span><br><span class="line">    volumes:</span><br><span class="line">      - hadoop_namenode:/hadoop/dfs/name</span><br><span class="line">      - ./entrypoint.sh:/entrypoint.sh</span><br><span class="line">    environment:</span><br><span class="line">      - CLUSTER_NAME=test</span><br><span class="line">    env_file:</span><br><span class="line">      - ./hadoop.env</span><br></pre></td></tr></table></figure>
+<p>namenode的webUI端口：50070<br>yarn的web端口：8088<br>spark集群的web端口：8080<br>spark-job监控端口：4040<br>spark配置ui<br><a href="https://wongxingjun.github.io/2016/11/07/Spark-on-YARN%E9%85%8D%E7%BD%AE%E6%97%A5%E5%BF%97Web-UI/" target="_blank" rel="noopener">https://wongxingjun.github.io/2016/11/07/Spark-on-YARN%E9%85%8D%E7%BD%AE%E6%97%A5%E5%BF%97Web-UI/</a></p>
+<h4 id="小问题"><a href="#小问题" class="headerlink" title="小问题"></a>小问题</h4><ul>
+<li>docker ubuntu 时区问题</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&gt; date</span><br><span class="line">&gt; Wed Nov 20 06:00:27 Asia 2019</span><br><span class="line">&gt; tzselect 报错</span><br><span class="line">出现/usr/bin/tzselect: line 180: /usr/share/zoneinfo/iso3166.tab: No such file or directory</span><br><span class="line">/usr/bin/tzselect: time zone files are not <span class="built_in">set</span> up correctly</span><br><span class="line">且 /usr/share/ 路径下没有 zoneinfo 文件夹，安装：</span><br><span class="line">&gt; apt-get install tzdata</span><br><span class="line"> </span><br><span class="line">如果还没有解决，</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"export TZ=Asia/Shanghai"</span> &gt;&gt; ~/.bashrc</span><br><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br><span class="line"></span><br><span class="line">-检验</span><br><span class="line">&gt; date</span><br><span class="line">&gt; tzselect</span><br><span class="line"></span><br><span class="line"><span class="comment">#https://blog.csdn.net/afr3828/article/details/79090974</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>docker 中使用mount命令报错：mount: permission denied</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">需求：在docker中挂载nas</span><br><span class="line">方案一：在docker-compose中配置</span><br><span class="line">方案二：在docker内部执行</span><br><span class="line">报错-：在docker run启动容器时加上--privileged</span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/07/05/docker/">戳开戳开 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-cluster" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/07/05/cluster/">cluster</a>
+    </h1>
+  
+
+        
+        <a href="/2019/07/05/cluster/" class="archive-article-date">
+  	<time datetime="2019-07-05T02:22:37.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-05</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="yarn"><a href="#yarn" class="headerlink" title="yarn"></a>yarn</h4><ul>
+<li>Yarn和 Zookeeper</li>
+</ul>
+<p><a href="https://www.jianshu.com/p/7fa515425afc" target="_blank" rel="noopener">https://www.jianshu.com/p/7fa515425afc</a></p>
+<ul>
+<li>yarn 与 standalone 模式<br>1)与其他计算框架共享集群资源（eg.Spark框架与MapReduce框架同时运行，如果不用Yarn进行资源分配，MapReduce分到的内存资源会很少，效率低下）；资源按需分配，进而提高集群资源利用等。<br>2)相较于Spark自带的Standalone模式，Yarn的资源分配更加细致<br>3)Application部署简化，例如Spark，Storm等多种框架的应用由客户端提交后，由Yarn负责资源的管理和调度，利用Container作为资源隔离的单位，以它为单位去使用内存,cpu等。<br>4)Yarn通过队列的方式，管理同时运行在Yarn集群中的多个服务，可根据不同类型的应用程序负载情况，调整对应的资源使用量，实现资源弹性管理。<br>#<a href="https://blog.csdn.net/qq595662096/article/details/81177744" target="_blank" rel="noopener">https://blog.csdn.net/qq595662096/article/details/81177744</a> </li>
+</ul>
+<p>在Spark Standalone模式下，集群资源调度由Master节点负责。Spark也可以将资源调度交给YARN来负责，其好处是YARN支持动态资源调度。Standalone模式只支持简单的固定资源分配策略，每个任务固定数量的core，各Job按顺序依次分配资源，资源不够时排队等待。这种策略适用单用户的场景，但在多用户时，各用户的程序差别很大，这种简单粗暴的策略很可能导致有些用户总是分配不到资源，而YARN的动态资源分配策略可以很好地解决这个问题。关于资源调度，第3章中还会详细讲解。</p>
+<p>另外，YARN作为通用的资源调度平台，除了为Spark提供调度服务外，还可以为其他子系统（比如Hadoop MapReduce、Hive）提供调度，这样由YARN来统一为集群上的所有计算负载分配资源，可以避免资源分配的混乱无序。<br><a href="https://cloud.tencent.com/developer/article/1151064" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1151064</a></p>
+<h4 id="spark"><a href="#spark" class="headerlink" title="spark"></a>spark</h4><ul>
+<li><p>spark题目<br><a href="https://cloud.tencent.com/developer/article/1084908" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1084908</a></p>
+</li>
+<li><p>spark常见问题<br><a href="https://www.cnblogs.com/arachis/p/Spark_Exception.html" target="_blank" rel="noopener">https://www.cnblogs.com/arachis/p/Spark_Exception.html</a></p>
+</li>
+<li><p>部署模式</p>
+</li>
+</ul>
+<p>大的三种模式，应该上standalone，mesos，yarn。而standalone又有HA模式。但是据说yarn本身如果已经resourcemanager 做了HA了的话，就不用再考虑HA了的。还要yarn本身还有2种模式，一种上master，一种client。我倾向于standalone的HA，还有yarn。</p>
+<ul>
+<li>spark的高可用设置</li>
+</ul>
+<p>有两种，一种是通过Zookeeper来实现，另一种是通过本地文件系统来实现。<br>使用ZooKeeper备份master，利用zookeeper提供的领导选举和状态保存，你可以让更多的master连接到zookeepre实例。一个将会被选举为leader其他的则会保存备份他的状态。如果master死掉，zookeeper可以选举一个新的leader，整个过程需要1到2分钟的时间，但是这个过程只会对新的任务调度有影响。为了使用这种方式需要的配置项为：SPARK_DAEMON_JAVA_OPTS，这个配置项有三个配置信息：spark.deploy.recoveryMode/spark.deploy.zookeeper.url/spark.deploy.zookeeper.dir<br>使用本地文件系统来恢复该节点。为了使用这种方式需要的配置项为：SPARK_DAEMON_JAVA_OPTS，这个配置项有两个配置信息：spark.deploy.recoveryMode、spark.deploy.recoveryDirectory<br>链接：<a href="https://www.jianshu.com/p/fa09d31460a1" target="_blank" rel="noopener">https://www.jianshu.com/p/fa09d31460a1</a></p>
+<ul>
+<li>在Hadoop YARN群集之上安装，配置和运行Spark</li>
+</ul>
+<p>#<a href="https://cloud.tencent.com/developer/article/1343311" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1343311</a></p>
+<h4 id="Hive"><a href="#Hive" class="headerlink" title="Hive"></a>Hive</h4><ul>
+<li>Hive中存放是什么？<br>表（数据+元数据）。 存的是和hdfs的映射关系，hive是逻辑上的数据仓库，实际操作的都是hdfs上的文件，HQL就是用sql语法来写的mr程序。</li>
+</ul>
+<h4 id="zookeeper"><a href="#zookeeper" class="headerlink" title="zookeeper"></a>zookeeper</h4><ul>
+<li>配置spark.deploy.recoveryMode选项为ZOOKEEPER<br>如果不设置spark.deploy.recoveryMode的话，那么集群的所有运行数据在Master重启是都会丢失，可参考BlackHolePersistenceEngine的实现。</li>
+</ul>
+<h4 id="Yarn-和-Zookeeper"><a href="#Yarn-和-Zookeeper" class="headerlink" title="Yarn 和 Zookeeper"></a>Yarn 和 Zookeeper</h4><p> YARN has a HA variant (a highly available setup). In that HA setup, Automatic failover (though embedded leader election) is set up via Zookeeper.</p>
+<p>在hadoop2.0中，集成了yarn作为资源管理。则spark on yarn 需告诉hadoop配置，使用hadoop的yarn<br>在Hadoop YARN群集之上安装，配置和运行Spark</p>
+<p>#<a href="https://cloud.tencent.com/developer/article/1343311" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1343311</a></p>
+<h4 id="hadoop2-0"><a href="#hadoop2-0" class="headerlink" title="hadoop2.0"></a>hadoop2.0</h4><p><a href="https://www.cnblogs.com/wadeyu/p/9696080.html" target="_blank" rel="noopener">https://www.cnblogs.com/wadeyu/p/9696080.html</a></p>
+<h4 id="docker-swarm"><a href="#docker-swarm" class="headerlink" title="docker-swarm"></a>docker-swarm</h4><p>spread策略是没问题的，但是swarm在调度的时候没有把一项很重要的内容加进去，那就是实例的容灾。world服务的两个replica被调度到同一台主机上，那么这台主机挂了，整个服务就挂了。其实replica的概念就是要在多个地方存放，以防止单主机出现问题导致服务不可用。比如HDFS的3个replica一般要放到不同机器上，甚至还要考虑不同机柜，不同机房。</p>
+<h4 id="docker-swarm小工具"><a href="#docker-swarm小工具" class="headerlink" title="docker-swarm小工具"></a>docker-swarm小工具</h4><ul>
+<li>Traefik 实战(traefik+docker swarm)</li>
+</ul>
+<p><a href="https://my.oschina.net/guol/blog/1942373" target="_blank" rel="noopener">https://my.oschina.net/guol/blog/1942373</a></p>
+<p>Nginx的另一个选择 - Traefik 入手及简单配置（都是反向代理）</p>
+<p>#<a href="https://juejin.im/post/5c514a2851882577cd1f6cfa" target="_blank" rel="noopener">https://juejin.im/post/5c514a2851882577cd1f6cfa</a></p>
+<h4 id="集群搭建"><a href="#集群搭建" class="headerlink" title="集群搭建"></a>集群搭建</h4><ul>
+<li><p>Hadoop + Spark on Yarn集群搭建<br>#<a href="https://medium.com/@zihansyu/hadoop-spark-on-yarn集群搭建-上-603ebd0dad2a" target="_blank" rel="noopener">https://medium.com/@zihansyu/hadoop-spark-on-yarn集群搭建-上-603ebd0dad2a</a></p>
+</li>
+<li><p>Spark学习之路（七）—— 基于ZooKeeper搭建Spark高可用集群<br>#<a href="https://www.cnblogs.com/heibaiying/p/11026227.html" target="_blank" rel="noopener">https://www.cnblogs.com/heibaiying/p/11026227.html</a></p>
+</li>
+<li><p>使用docker stack建构跨主机PySpark+Jupyter集群<br>#<a href="https://www.twblogs.net/a/5c19b00ebd9eee5e40bc0829/zh-cn" target="_blank" rel="noopener">https://www.twblogs.net/a/5c19b00ebd9eee5e40bc0829/zh-cn</a></p>
+</li>
+</ul>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/07/05/cluster/">戳开戳开 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-python-风格指南" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/04/16/python-风格指南/">python 风格指南</a>
+    </h1>
+  
+
+        
+        <a href="/2019/04/16/python-风格指南/" class="archive-article-date">
+  	<time datetime="2019-04-16T06:53:06.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-04-16</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="Part1-python-语言规范"><a href="#Part1-python-语言规范" class="headerlink" title="Part1. python 语言规范"></a>Part1. python 语言规范</h4><ul>
+<li>1.pylint</li>
+<li>2.导入 import  xx；from xx import yy</li>
+<li>3.包：导入完整包名</li>
+<li>4.Exception：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">4.1 像这样触发异常: raise MyException(&quot;Error message&quot;) 或者 raise MyException . 不要使用两个参数的形式( raise MyException, &quot;Error message&quot; )或者过时的字符串异常( raise &quot;Error message&quot; ).</span><br><span class="line">4.2 模块或包应该定义自己的特定域的异常基类, 这个基类应该从内建的Exception类继承. 模块的异常基类应该叫做”Error”.</span><br><span class="line">	class Error(Exception):                            	pass</span><br><span class="line">4.3 never use Except to catch all error and Minimize the amount of code in a try/except block. －&gt; the try/except block hides a real error.</span><br><span class="line">4.4 Use the finally clause to execute code whether or not an exception is raised in the try block. e.g close file</span><br><span class="line">4.5 使用as而不是都,</span><br><span class="line">   try:</span><br><span class="line">		raise Error</span><br><span class="line">   except Error as error:</span><br><span class="line">		pass</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<ul>
+<li>5.全局变量： 避免使用全局变量</li>
+<li>6.生成器<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; sum(i*i for i in range(10))</span><br><span class="line">285</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="python类实践"><a href="#python类实践" class="headerlink" title="python类实践"></a>python类实践</h4><p>为类实例添加独有的方法<br>Language.samelang  = types.MethodType(samelang, Language)<br>Language.samelang()</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/04/16/python-风格指南/">戳开戳开 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-reveal-js" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/22/reveal-js/">reveal.js</a>
+    </h1>
+  
+
+        
+        <a href="/2019/02/22/reveal-js/" class="archive-article-date">
+  	<time datetime="2019-02-22T02:33:41.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-02-22</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><a href="https://github.com/hakimel/reveal.js" target="_blank" rel="noopener">https://github.com/hakimel/reveal.js</a><br>基本setup：下载后修改index.html<br>全部setup: 运行server</p>
+<p><a href="https://sspai.com/post/40657" target="_blank" rel="noopener">https://sspai.com/post/40657</a></p>
+<p>#####</p>
+<ul>
+<li>上下页面</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;section&gt;</span><br><span class="line"></span><br><span class="line">	    &lt;section&gt;这是付费教程的升级&lt;/section&gt;</span><br><span class="line"></span><br><span class="line">	    &lt;section&gt;还是下一个圈钱手段&lt;/section&gt;</span><br><span class="line"></span><br><span class="line">	&lt;/section&gt;</span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/02/22/reveal-js/">戳开戳开 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-ElasticSearch" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/15/ElasticSearch/">ElasticSearch</a>
+    </h1>
+  
+
+        
+        <a href="/2019/01/15/ElasticSearch/" class="archive-article-date">
+  	<time datetime="2019-01-15T06:02:57.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="安装elasticsearch"><a href="#安装elasticsearch" class="headerlink" title="安装elasticsearch"></a>安装elasticsearch</h4><p>同步<br>//<a href="https://www.jianshu.com/p/7a35a7d56c67" target="_blank" rel="noopener">https://www.jianshu.com/p/7a35a7d56c67</a><br>pandas读取elasticsearch<a href="https://www.jianshu.com/p/22674491deb9" target="_blank" rel="noopener">https://www.jianshu.com/p/22674491deb9</a><br>elasticsearch 使用指南#<a href="https://www.cnblogs.com/yueshutong/p/9381543.html" target="_blank" rel="noopener">https://www.cnblogs.com/yueshutong/p/9381543.html</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#</span><br><span class="line">from elasticsearch import Elasticsearch</span><br></pre></td></tr></table></figure>
+<h6 id="failed-安装neo4j-elasticsearch"><a href="#failed-安装neo4j-elasticsearch" class="headerlink" title="(failed)安装neo4j-elasticsearch"></a>(failed)安装neo4j-elasticsearch</h6><ul>
+<li><a href="https://github.com/neo4j-contrib/neo4j-elasticsearch" target="_blank" rel="noopener">https://github.com/neo4j-contrib/neo4j-elasticsearch</a></li>
+</ul>
+<p>downloads: wget http://….jar<br>copy to plugins: cp xxx.jar /var/lib/neo4j/plugins<br>change /etc/neo4j/neo4j.conf:<br>in neo4j: MATCH (n:CN_Songinfo) SET n.title = n.title,n.lyric = n.lyric;</p>
+<p>各种尝试各种加包最终宣告失败<br>log4j-1.2.17.jar<br>logkit-2.0.jar<br>neo4j-elasticsearch-3.4.5.jar<br>slf4j-log4j12-1.7.24.jar<br>log4.property</p>
+<h6 id="安装neo4j-to-elasticsearch"><a href="#安装neo4j-to-elasticsearch" class="headerlink" title="安装neo4j-to-elasticsearch"></a>安装neo4j-to-elasticsearch</h6><p><a href="https://github.com/graphaware/neo4j-to-elasticsearch" target="_blank" rel="noopener">https://github.com/graphaware/neo4j-to-elasticsearch</a><br>把下载好的对应版本的neo4j-to-elasticsearch,server,uuid 放入neo4j的plugins</p>
+<ul>
+<li>又失败-。-<br>!!<a href="https://github.com/graphaware/neo4j-to-elasticsearch/blob/master/docs/json-mapper.md" target="_blank" rel="noopener">https://github.com/graphaware/neo4j-to-elasticsearch/blob/master/docs/json-mapper.md</a></li>
+<li>竟然成功了？！！！<br>neo4j里面关于es的设置只保留uuid部分，其他的用JsonFile设置（关于es的部分）。初始化时，uuidinitilize 设置很大，之后置-1，设置es其他initilize 很大。</li>
+</ul>
+<h5 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h5><ul>
+<li><p>分析器Analyzer<br>#<a href="https://www.jianshu.com/p/c47cd5313653" target="_blank" rel="noopener">https://www.jianshu.com/p/c47cd5313653</a></p>
+</li>
+<li><p>当数据量小的时候，分片影响score<br>//<a href="https://farer.org/2018/09/10/practical-bm25-part-1-how-shards-affect-relevance-scoring-in-elasticsearch/" target="_blank" rel="noopener">https://farer.org/2018/09/10/practical-bm25-part-1-how-shards-affect-relevance-scoring-in-elasticsearch/</a></p>
+</li>
+<li><p>elasticsearch 堆内存设置<br>ES_JAVA_OPTS=”-Xms2g -Xmx2g” ./bin/elasticsearch </p>
+</li>
+</ul>
+<h5 id="搜索尝试"><a href="#搜索尝试" class="headerlink" title="搜索尝试"></a>搜索尝试</h5><ul>
+<li>match_phrase_prefix</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&quot;query&quot;: &#123;</span><br><span class="line">  &quot;match_phrase_prefix&quot;: &#123;</span><br><span class="line">    &quot;title&quot;: &#123;</span><br><span class="line">      &quot;query&quot;: &quot;hello w&quot;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="python操作es"><a href="#python操作es" class="headerlink" title="python操作es"></a>python操作es</h4><p>python-elasticsearch </p>
+<p>#<a href="https://www.cnblogs.com/shaosks/p/7592229.html" target="_blank" rel="noopener">https://www.cnblogs.com/shaosks/p/7592229.html</a></p>
+<p>#<a href="https://juejin.im/post/5a34c3f7f265da433227a3cc.html" target="_blank" rel="noopener">https://juejin.im/post/5a34c3f7f265da433227a3cc.html</a></p>
+<h5 id="关于index"><a href="#关于index" class="headerlink" title="关于index"></a>关于index</h5><ul>
+<li><p>index 的设置<br>index_options:’docs’, 仅考虑命中<br>index_options:’’,考虑命中以及频率</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">result = es.indices.create(index=&apos;nodes-cnsonginfo&apos;, ignore=400)</span><br><span class="line">mapping = &#123;</span><br><span class="line">    &apos;properties&apos;: &#123;</span><br><span class="line">         &quot;title&quot; : &#123;</span><br><span class="line">         &quot;type&quot;: &quot;text&quot;,</span><br><span class="line">         &quot;index_options&quot;: &quot;docs&quot;,</span><br><span class="line">             &quot;norms&quot;: &#123; &quot;enabled&quot;: &apos;false&apos; &#125;,</span><br><span class="line">          &quot;analyzer&quot;: &quot;ik_max_word&quot;,</span><br><span class="line">          &quot;fields&quot;: &#123;</span><br><span class="line">          &quot;smart&quot;: &#123;</span><br><span class="line">            &quot;type&quot;: &quot;text&quot;,</span><br><span class="line">              &quot;norms&quot;: &#123; &quot;enabled&quot;: &apos;false&apos; &#125;,</span><br><span class="line">               &quot;index_options&quot;: &quot;docs&quot;,</span><br><span class="line">            &quot;analyzer&quot;: &quot;ik_smart&quot;&#125;&#125;&#125;</span><br><span class="line">           &#125;&#125;&#125;</span><br><span class="line">result = es.indices.put_mapping(index=&apos;songs&apos;, doc_type=&apos;text&apos;, body=mapping)</span><br><span class="line">print result</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>index操作</p>
+</li>
+</ul>
+<p>zho<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">查看所有index curl &apos;localhost:9200/_cat/indices?v&apos;</span><br><span class="line"></span><br><span class="line">curl -XDELETE &apos;http://host.IP.address:9200/logstash-*&apos;</span><br><span class="line">删除所有以logstash-开始的索引。</span><br><span class="line">刷新数据`GET http://localhost:9200/schools/_refresh	`</span><br><span class="line"></span><br><span class="line">关闭index `!curl -XPOST &apos;http://localhost:9200/nodes-cnsonginfo/_close?pretty&apos;`</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">删除index：result = es.indices.delete(index=&apos;nodes-cnsonginfo&apos;, ignore=[400, 404])</span><br></pre></td></tr></table></figure>
+<ul>
+<li>其他<br><code>search 内添加，返回指定字段&quot;_source&quot;:[&quot;name&quot;],</code></li>
+</ul>
+<h4 id="错误处理"><a href="#错误处理" class="headerlink" title="错误处理"></a>错误处理</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[2019-02-16T18:53:01,952][WARN ][o.e.x.s.t.n.SecurityNetty4HttpServerTransport] [e4XVtVK] caught exception while handling client http traffic, closing connection [id: 0xa0c99143, L:/10.70.24.117:9200 - R:/10.120.105.203:39882]</span><br><span class="line">java.io.IOException: 连接超时</span><br><span class="line">	at sun.nio.ch.FileDispatcherImpl.read0(Native Method) ~[?:?]</span><br><span class="line">	at sun.nio.ch.SocketDispatcher.read(SocketDispatcher.java:39) ~[?:?]</span><br><span class="line">	at sun.nio.ch.IOUtil.readIntoNativeBuffer(IOUtil.java:223) ~[?:?]</span><br><span class="line">	at sun.nio.ch.IOUtil.read(IOUtil.java:197) ~[?:?]</span><br><span class="line">	at sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:380) ~[?:?]</span><br><span class="line">	at io.netty.buffer.PooledHeapByteBuf.setBytes(PooledHeapByteBuf.java:261) ~[netty-buffer-4.1.30.Final.jar:4.1.30.Final]</span><br><span class="line">	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1128) ~[netty-buffer-4.1.30.Final.jar:4.1.30.Final]</span><br><span class="line">	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:347) ~[netty-transport-4.1.30.Final.jar:4.1.30.Final]</span><br><span class="line">	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:148) [netty-transport-4.1.30.Final.jar:4.1.30.Final]</span><br><span class="line">	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:644) [netty-transport-4.1.30.Final.jar:4.1.30.Final]</span><br><span class="line">	at io.netty.channel.nio.NioEventLoop.processSelectedKeysPlain(NioEventLoop.java:544) [netty-transport-4.1.30.Final.jar:4.1.30.Final]</span><br><span class="line">	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:498) [netty-transport-4.1.30.Final.jar:4.1.30.Final]</span><br><span class="line">	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:458) [netty-transport-4.1.30.Final.jar:4.1.30.Final]</span><br><span class="line">	at io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:897) [netty-common-4.1.30.Final.jar:4.1.30.Final]</span><br></pre></td></tr></table></figure>
+<ul>
+<li>可能原因一 http指明<br><a href="https://www.jianshu.com/p/8af97ccc6091" target="_blank" rel="noopener">https://www.jianshu.com/p/8af97ccc6091</a></li>
+<li>keepalive设置防火墙阻隔</li>
+</ul>
+<p>所做尝试<br>vim etc/sysctl<br>add net.ipv4.tcp_keepalive_time = 600<br>   net.ipv4.tcp_keepalive_intvl = 60<br>   net.ipv4.tcp_keepalive_probes = 3<br>修改elasticsearch配置 vim elasticsearch.yml<br>add network.tcp.keep_alive:true</p>
+<p>查看连接的创建时间<br>netstat -npt | grep port 查看pid<br>ps -p PID -o lstart,etime</p>
+<h6 id="安装elasticsearch-1"><a href="#安装elasticsearch-1" class="headerlink" title="安装elasticsearch"></a>安装elasticsearch</h6><p>-后台运行 ./elasticsearch -d</p>
+<p>-jps 查看运行情况</p>
+<p>-使用elasticsearch-plugin<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">. ./bin/elasticsearch-plugin install https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v6.6.0/elasticsearch-analysis-ik-6.6.0.zip</span><br><span class="line">- 查看es健康状态</span><br><span class="line">curl http://localhost:9200/_cat/health?v</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li><p>cnsonginfo</p>
+</li>
+</ul>
+<p>#####</p>
+<ul>
+<li>filter,query<br><a href="https://juejin.im/post/5c180f0df265da6124155db5" target="_blank" rel="noopener">https://juejin.im/post/5c180f0df265da6124155db5</a><br><a href="https://blog.csdn.net/u011262847/article/details/78007119" target="_blank" rel="noopener">https://blog.csdn.net/u011262847/article/details/78007119</a><br><a href="https://doc.yonyoucloud.com/doc/mastering-elasticsearch/chapter-2/27_README.html" target="_blank" rel="noopener">https://doc.yonyoucloud.com/doc/mastering-elasticsearch/chapter-2/27_README.html</a></li>
+</ul>
+<p>写数据工作原理<br><a href="https://juejin.im/post/5c99e7f1e51d455a1b5f84c2" target="_blank" rel="noopener">https://juejin.im/post/5c99e7f1e51d455a1b5f84c2</a></p>
+<ul>
+<li>multi match<br><a href="https://blog.csdn.net/qq_36330643/article/details/79071737" target="_blank" rel="noopener">https://blog.csdn.net/qq_36330643/article/details/79071737</a><br>-match_phrase要求query的所有字词都命中。</li>
+</ul>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/01/15/ElasticSearch/">戳开戳开 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-Linux-Tips" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/10/26/Linux-Tips/">Linux Tips</a>
+    </h1>
+  
+
+        
+        <a href="/2018/10/26/Linux-Tips/" class="archive-article-date">
+  	<time datetime="2018-10-26T07:57:57.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-10-26</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>#####</p>
+<ul>
+<li><p>显示主机所有ip</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hostname --all-ip-addresses</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看系统时间</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">date -R</span><br><span class="line">#https://www.jianshu.com/p/813294e5339e</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查找进程</p>
+</li>
+</ul>
+<p><code>ps aux | grep xxx</code></p>
+<ul>
+<li>查看版本号</li>
+</ul>
+<p>apt-cache show mysql-server | grep Version</p>
+<ul>
+<li>存储空间</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">查看磁盘占用率 du -h --max-depth=1（目录层数）</span><br><span class="line">在当前目录下 du -sm * | sort -n 查看磁盘占用的升序排列</span><br></pre></td></tr></table></figure>
+<ul>
+<li>找到10天前的文件，并删除</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find . -mtime +10 | xargs rm -rf &#123;&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查找python安装包的路径 </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -c &quot;import fasttext;print(fasttext)&quot;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>其他</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$  date -d yesterday +%F </span><br><span class="line">2018-04-23</span><br><span class="line"></span><br><span class="line">-exec&lt;执行指令&gt;：假设find指令的回传值为True，就执行该指令；</span><br><span class="line">find . -name &quot;*.csv&quot; -exec mv &#123;&#125; ./$filec.csv \;</span><br></pre></td></tr></table></figure>
+<h5 id="jupyter-notebook"><a href="#jupyter-notebook" class="headerlink" title="jupyter notebook"></a>jupyter notebook</h5><ul>
+<li>设置jupyter 外部访问</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">端口转发ssh -L localhost:2000:localhost:3000 root@103.59.22.17</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">生成配置文件</span><br><span class="line">jupyter notebook --generate-config</span><br><span class="line"></span><br><span class="line">在jupyter notebook 中</span><br><span class="line">In [1]: from notebook.auth import passwd</span><br><span class="line">In [2]: passwd()</span><br><span class="line">Enter password:</span><br><span class="line">Verify password:</span><br><span class="line">Out[2]: &apos;sha1:67c9e60bb8b6:9ffede0825894254b2e042ea597d771089e11aed&apos;</span><br><span class="line"></span><br><span class="line">在生成的配置文件中jupyter_notebook_config.py </span><br><span class="line">c.NotebookApp.ip=&apos;*&apos;</span><br><span class="line">c.NotebookApp.password = u&apos;sha:ce...刚才复制的那个密文&apos;</span><br><span class="line">c.NotebookApp.open_browser = False</span><br><span class="line">c.NotebookApp.port =8888 #可自行指定一个端口, 访问时使用该端口</span><br><span class="line"></span><br><span class="line">#https://blog.csdn.net/simple_the_best/article/details/77005400</span><br></pre></td></tr></table></figure>
+<ul>
+<li>centos中的外部访问</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">python -m notebook --generate-config</span><br><span class="line">注意c.NotebookApp.ip=&apos;*&apos;是&apos;0.0.0.0&apos;</span><br></pre></td></tr></table></figure>
+<h4 id="查看系统信息"><a href="#查看系统信息" class="headerlink" title="查看系统信息"></a>查看系统信息</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">查看系统版本:head -n 1 /etc/issue</span><br><span class="line"> cat /etc/issue</span><br><span class="line"> </span><br><span class="line">https://blog.51cto.com/liguxk/152912</span><br></pre></td></tr></table></figure>
+<p>Ubuntu清理硬盘空间的8个技巧</p>
+<p>#<a href="https://blog.csdn.net/m0_37407756/article/details/79903837" target="_blank" rel="noopener">https://blog.csdn.net/m0_37407756/article/details/79903837</a></p>
+<h4 id="crontab"><a href="#crontab" class="headerlink" title="crontab"></a>crontab</h4><ul>
+<li><p>crontab 任务不执行<br>可能是python运行路径与crontab默认运行路径不同，需指定python运行路径（whereis python）</p>
+<p>–tail nohup.out | grep “‘domain’: ‘music’” &gt;&gt; ../jyli/tm.txt</p>
+</li>
+</ul>
+<p>####</p>
+<ul>
+<li>scp</li>
+</ul>
+<p>Scp  xxx(file) <a href="mailto:tclmedia@10.120.105.203" target="_blank" rel="noopener">tclmedia@10.120.105.203</a>:/home/tclmedia/jyli/sqlfiles  复制本地文件到远程</p>
+<h4 id="git常用命令"><a href="#git常用命令" class="headerlink" title="git常用命令"></a>git常用命令</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git add 文件夹/ 添加整个文件夹</span><br></pre></td></tr></table></figure>
+<h5 id="关于GPU"><a href="#关于GPU" class="headerlink" title="关于GPU"></a>关于GPU</h5><ul>
+<li>监控gpu<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch -n 0.1 nvidia-smi 实时变化</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>分析：<br>显存占用和GPU占用是两个不一样的东西，显卡是由GPU和显存等组成的，显存和GPU的关系有点类似于内存和CPU的关系。我跑caffe代码的时候显存占得少，GPU占得多，师弟跑TensorFlow代码的时候，显存占得多，GPU占得少。</p>
+<p>#<a href="https://blog.csdn.net/sallyxyl1993/article/details/62220424" target="_blank" rel="noopener">https://blog.csdn.net/sallyxyl1993/article/details/62220424</a><br>tricks用的好GPU利用率掉不下来99%，然鹅代码写的足够蠢，也可以上不去5%！<a href="https://www.jiqizhixin.com/articles/2019-01-09-21" target="_blank" rel="noopener">https://www.jiqizhixin.com/articles/2019-01-09-21</a></p>
+<h4 id="备份"><a href="#备份" class="headerlink" title="备份"></a>备份</h4><ul>
+<li>命令</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line">mysqldump -u用户名 -p密码 o2o &gt; 路径.sql</span><br><span class="line">mysqldump -uxx -pxx@xx wifi &gt; /home/wifi.sql</span><br><span class="line">tar -zcvf /home/tcluser/tclbi.tar.gz /home/tcluser/tclbi</span><br><span class="line"><span class="comment">#tar -zcvf /home/tcluser/etc.tar.gz /etc</span></span><br></pre></td></tr></table></figure>
+<h4 id="访问"><a href="#访问" class="headerlink" title="访问"></a>访问</h4><ul>
+<li>request访问接口</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line">url = <span class="string">'http://xx:8000/api/v1/sql/mysql/sqlcommand/'</span></span><br><span class="line">headers = &#123;<span class="string">'Content-Type'</span>: <span class="string">"application/json"</span>&#125;</span><br><span class="line">data = &#123;<span class="string">'sqlcommand'</span>:<span class="string">"xxx"</span>&#125;</span><br><span class="line">res = requests.post(url, json = data, headers = headers)</span><br><span class="line"><span class="comment">#print res.text</span></span><br><span class="line"><span class="keyword">print</span> res.json()[<span class="string">"data"</span>]</span><br><span class="line"><span class="keyword">print</span> res.raw</span><br><span class="line"><span class="comment">#print type(eval(res.text)["data"])</span></span><br></pre></td></tr></table></figure>
+<h4 id="更换debian的apt源"><a href="#更换debian的apt源" class="headerlink" title="更换debian的apt源"></a>更换debian的apt源</h4><ul>
+<li><p>各类源地址<br>#<a href="https://www.iabmu.com/archives/debian-mirror-list.html" target="_blank" rel="noopener">https://www.iabmu.com/archives/debian-mirror-list.html</a></p>
+</li>
+<li><p>更改源地址</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">mv /etc/apt/sources.list /etc/apt/sources.list.bak</span><br><span class="line">echo &quot;deb http://ftp.hk.debian.org/debian/ jessie main&quot;&gt;&gt; /etc/apt/sources.list</span><br><span class="line">echo &quot;deb-src http://ftp.hk.debian.org/debian/ jessie main&quot;&gt;&gt; /etc/apt/sources.list</span><br><span class="line">echo &quot;deb http://security.debian.org/ jessie/updates main&quot;&gt;&gt; /etc/apt/sources.list</span><br><span class="line">echo &quot;deb-src http://security.debian.org/ jessie/updates main&quot;&gt;&gt; /etc/apt/sources.list</span><br><span class="line">echo &quot;deb http://ftp.hk.debian.org/debian/ jessie-updates main&quot;&gt;&gt; /etc/apt/sources.list</span><br><span class="line">echo &quot;deb-src http://ftp.hk.debian.org/debian/ jessie-updates main&quot; &gt;&gt; /etc/apt/sources.list</span><br><span class="line"></span><br><span class="line">即</span><br><span class="line">echo &quot;$(sed &apos;$a\deb http://ftp.hk.debian.org/debian/ jessie main\ndeb-src http://ftp.hk.debian.org/debian/ jessie main\ndeb http://security.debian.org/ jessie/updates main\ndeb-src http://security.debian.org/ jessie/updates main\ndeb http://ftp.hk.debian.org/debian/ jessie-updates main\ndeb-src http://ftp.hk.debian.org/debian/ jessie-updates main&apos; /etc/apt/sources.list)&quot; &gt;/etc/apt/sources.list</span><br></pre></td></tr></table></figure>
+<ul>
+<li>升级</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">apt-get upgrade</span><br><span class="line"></span><br><span class="line">报错：There is no public key available for the following key ID</span><br><span class="line">解决：apt-get install debian-keyring debian-archive-keyring</span><br></pre></td></tr></table></figure>
+<ul>
+<li>安装vim</li>
+</ul>
+<p>apt-get install vim</p>
+<h4 id="ssh"><a href="#ssh" class="headerlink" title="ssh"></a>ssh</h4><ul>
+<li>安装ssh</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">apt-get install ssh</span><br><span class="line">apt-get install -y openssh-server</span><br><span class="line">/etc/init.d/ssh start #开启ssh</span><br><span class="line"></span><br><span class="line">- 配置密钥登录</span><br><span class="line"></span><br><span class="line">cat /root/.ssh/id_rsa</span><br><span class="line">把内容保存在xxx.pem</span><br><span class="line">chmod 600 xxx.pem</span><br><span class="line">vi /etc/ssh/sshd_config</span><br><span class="line">修改为RSAAuthentication yes</span><br><span class="line">PubkeyAuthentication yes</span><br><span class="line">重启  service sshd restart</span><br><span class="line">登录：ssh -i key.pem root@10.37.0.1</span><br></pre></td></tr></table></figure>
+<ul>
+<li>sh可执行文件</li>
+</ul>
+<p>sh文件头#!/bin/bash<br>chmod +x test2.sh</p>
+<ul>
+<li>ubuntu安装选择源</li>
+</ul>
+<p><a href="https://blog.csdn.net/yjk13703623757/article/details/78945576" target="_blank" rel="noopener">https://blog.csdn.net/yjk13703623757/article/details/78945576</a><br>查看所有源apt-cache madison package<br>查看指定包情况 apt-cache show package</p>
+<ul>
+<li>防火墙</li>
+</ul>
+<p>sudo ufw status  查看状态</p>
+<ul>
+<li>压缩解压缩</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">压缩</span><br><span class="line">tar czvf test.tar.gz *   </span><br><span class="line">tar -zvcf buodo.tar.gz buodo</span><br><span class="line">解压</span><br><span class="line">tar -zvxf buodo.tar.gz </span><br><span class="line">#https://blog.csdn.net/capecape/article/details/78548723</span><br></pre></td></tr></table></figure>
+<ul>
+<li>修改环境变量</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">vim ~/.bashrc</span><br><span class="line">export PATH=/usr/local/nvidia/bin:/usr/local/cuda/bin/:$PATH</span><br><span class="line">source ~/.bashrc</span><br><span class="line"></span><br><span class="line">source</span><br></pre></td></tr></table></figure>
+<ul>
+<li>sed修改文本</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">sed -i &apos;/localhost/adatanode1\ndatanode2\ndatanode3&apos; conf/slaves</span><br><span class="line">sed -i &apos;19d&apos; conf/slaves  #删除第19行</span><br><span class="line">sed -i &apos;/export JAVA_HOME=$&#123;JAVA_HOME&#125;/aexport JAVA_HOME=\/usr\/lib\/jvm\/java-8-openjdk-amd64\/&apos; /etc/hadoop/hadoop-env.sh</span><br><span class="line"></span><br><span class="line"># 找到之后追加？？</span><br><span class="line"></span><br><span class="line">find matching text and replace next line</span><br><span class="line">sed &apos;/&lt;key&gt;ConnectionString&lt;\/key&gt;/!b;n;c&lt;string&gt;changed_value&lt;/string&gt;&apos; file</span><br><span class="line"></span><br><span class="line">sed查找指定行并替换下一行</span><br><span class="line"></span><br><span class="line">sed -i &apos;/&lt;name&gt;javax.jdo.option.ConnectionURL&lt;\/name&gt;/!b;n;c\ \ \ \ &lt;value&gt;jdbc:mysql://namenode:3306/hive?createDatabaseIfNotExist=true&lt;/value&gt;&apos; hive-site.xml</span><br><span class="line"></span><br><span class="line">sed -i &apos;/&lt;name&gt;javax.jdo.option.ConnectionDriverName&lt;\/name&gt;/!b;n;c\ \ \ \&lt;value&gt;com.mysql.jdbc.Driver&lt;/value&gt;&apos; hive-site.xml</span><br><span class="line"></span><br><span class="line">sed -i &apos;/&lt;name&gt;javax.jdo.option.ConnectionUserName&lt;\/name&gt;/!b;n;c\ \ \ \&lt;value&gt;hive&lt;/value&gt;&apos; hive-site.xml</span><br><span class="line">    </span><br><span class="line">sed -i &apos;/&lt;name&gt;javax.jdo.option.ConnectionPassword&lt;\/name&gt;/!b;n;c\ \ \ \&lt;value&gt;hive&lt;/value&gt;&apos; hive-site.xml</span><br><span class="line">    </span><br><span class="line">sed -i &apos;/&lt;name&gt;hive.exec.local.scratchdir&lt;\/name&gt;/!b;n;c\ \ \ \&lt;value&gt;/opt/apache-hive-2.3.6-bin/iotmp&lt;/value&gt;&apos; hive-site.xml</span><br><span class="line"></span><br><span class="line">sed -i &apos;/&lt;name&gt;hive.downloaded.resources.dir&lt;\/name&gt;/!b;n;c\ \ \ \&lt;value&gt;/opt/apache-hive-2.3.6-bin/iotmp&lt;/value&gt;&apos; hive-site.xml</span><br></pre></td></tr></table></figure>
+<h6 id="Linux-如何挂载nas盘"><a href="#Linux-如何挂载nas盘" class="headerlink" title="Linux 如何挂载nas盘"></a>Linux 如何挂载nas盘</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">mount -o username=fl,password=a^6,iocharset=utf8 //192.168.1.1/产品部 /mnt</span><br><span class="line"></span><br><span class="line">username=flt #nas用户名</span><br><span class="line">password #nas密码  </span><br><span class="line">iocharset=utf8 #路径中如有中文则添加此项，支持中文路径 </span><br><span class="line">//192.168.1.1/产品部 #nas路径</span><br><span class="line">/mnt  #挂载路径</span><br><span class="line"></span><br><span class="line">卸载mount </span><br><span class="line">umount -l /mnt/nas</span><br></pre></td></tr></table></figure>
+<p>#<a href="https://blog.csdn.net/xiaominggunchuqu/article/details/78912330" target="_blank" rel="noopener">https://blog.csdn.net/xiaominggunchuqu/article/details/78912330</a></p>
+<h5 id="git"><a href="#git" class="headerlink" title="git"></a>git</h5><ul>
+<li>本地修改与master冲突</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git merge --abort</span><br><span class="line">git reset --merge</span><br></pre></td></tr></table></figure>
+<ul>
+<li>md里加图片</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">your_name      --帐号</span><br><span class="line">your_repository  -- 仓库名</span><br><span class="line">images_folder     -- 存放图片的文件夹，如果是直接放在仓库根目录下，可以忽略这个</span><br><span class="line">img.jpg        -- 图片名</span><br><span class="line"></span><br><span class="line">![image](https://github.com/Miro12/&#123;repository &#125;/raw/master/imgs/xxx.png)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>git master 地址</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Git remote rm origin</span><br><span class="line">Git remote add origin httpurl（用户密码）</span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2018/10/26/Linux-Tips/">戳开戳开 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+  
+    <nav id="page-nav">
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
+    </nav>
   
 
 
@@ -466,7 +1423,7 @@
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2018 Jiayin Li
+    		&copy; 2019 Jiayin Li
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten

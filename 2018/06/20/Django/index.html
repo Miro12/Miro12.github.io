@@ -8,17 +8,17 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>Django | fine.</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="关于migrations 自从上次drop掉一个表后 我就掉进了一个坑 好不容易爬出来了-。-  1234567$ python manage.py migrate –fake pay zero之后，删除当前app的migrations的文件，仅保留__init__.py并且要去当前app所属数据库的django_migrations里删除当前app的记录（忘记是不是必须的了）$ python m">
+  <meta name="description" content="常用命令 启动Django  1234python manage.py celery worker -B 同时启动beatcelery -A demo beat -l debug --max-interval=60 celery -A demo worker -l debugpython manage.py runserver 0.0.0.0:8000  创建用户  1python manage.">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Django">
 <meta property="og:url" content="http://yoursite.com/2018/06/20/Django/index.html">
 <meta property="og:site_name" content="fine.">
-<meta property="og:description" content="关于migrations 自从上次drop掉一个表后 我就掉进了一个坑 好不容易爬出来了-。-  1234567$ python manage.py migrate –fake pay zero之后，删除当前app的migrations的文件，仅保留__init__.py并且要去当前app所属数据库的django_migrations里删除当前app的记录（忘记是不是必须的了）$ python m">
+<meta property="og:description" content="常用命令 启动Django  1234python manage.py celery worker -B 同时启动beatcelery -A demo beat -l debug --max-interval=60 celery -A demo worker -l debugpython manage.py runserver 0.0.0.0:8000  创建用户  1python manage.">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2018-06-20T09:59:00.224Z">
+<meta property="og:updated_time" content="2019-08-14T06:56:50.876Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Django">
-<meta name="twitter:description" content="关于migrations 自从上次drop掉一个表后 我就掉进了一个坑 好不容易爬出来了-。-  1234567$ python manage.py migrate –fake pay zero之后，删除当前app的migrations的文件，仅保留__init__.py并且要去当前app所属数据库的django_migrations里删除当前app的记录（忘记是不是必须的了）$ python m">
+<meta name="twitter:description" content="常用命令 启动Django  1234python manage.py celery worker -B 同时启动beatcelery -A demo beat -l debug --max-interval=60 celery -A demo worker -l debugpython manage.py runserver 0.0.0.0:8000  创建用户  1python manage.">
   
     <link rel="alternative" href="/atom.xml" title="fine." type="application/atom+xml">
   
@@ -178,10 +178,58 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h5 id="关于migrations"><a href="#关于migrations" class="headerlink" title="关于migrations"></a>关于migrations</h5><ul>
+        <h5 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h5><ul>
+<li>启动Django</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">python manage.py celery worker -B 同时启动beat</span><br><span class="line">celery -A demo beat -l debug --max-interval=60 </span><br><span class="line">celery -A demo worker -l debug</span><br><span class="line">python manage.py runserver 0.0.0.0:8000</span><br></pre></td></tr></table></figure>
+<ul>
+<li>创建用户</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python manage.py createsuperuser</span><br></pre></td></tr></table></figure>
+<ul>
+<li>创建app</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Python manage.py startapp appname</span><br><span class="line">添加应用settings.py,配置database,修改 DatabaseAppsRouter</span><br><span class="line">在settings.py &apos;wifi&apos;:&apos;wifi_db&apos;&#125;</span><br><span class="line">修改models.py (即创建数据表)</span><br><span class="line">修改admin.py 使在页面显示</span><br><span class="line"></span><br><span class="line">python manage.py migrate –database wifi</span><br></pre></td></tr></table></figure>
+<h6 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h6><ul>
+<li>配置多表连用</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">配置多表连用 https://code.ziqiangxuetang.com/django/django-multi-database.html</span><br><span class="line">Db_roubter.py</span><br></pre></td></tr></table></figure>
+<ul>
+<li>rest接口</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -l -H &quot;Content-type: application/json&quot; -X POST -d &apos;&#123;&apos;sqlcommand&apos;:&quot;select * from dim_wifi_prober_device order by load_time desc limit 2;&quot;&#125;&apos; http://...:8000/api/v1/sql/mysql/sqlcommand/</span><br></pre></td></tr></table></figure>
+<h6 id="美化django"><a href="#美化django" class="headerlink" title="美化django"></a>美化django</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">1.安装django-suit</span><br><span class="line">pip install https://github.com/darklow/django-suit/tarball/v2</span><br><span class="line"></span><br><span class="line">2. 在apps.py 中添加</span><br><span class="line"># my_project_app/apps.py</span><br><span class="line">from suit.apps import DjangoSuitConfig</span><br><span class="line">class SuitConfig(DjangoSuitConfig):</span><br><span class="line">    layout = &apos;horizontal&apos;</span><br><span class="line"> </span><br><span class="line">3.在setting中添加</span><br><span class="line">  &apos;media.apps.SuitConfig&apos;,  # before &apos;django.contrib.admin&apos;</span><br></pre></td></tr></table></figure>
+<h5 id="关于migrations"><a href="#关于migrations" class="headerlink" title="关于migrations"></a>关于migrations</h5><ul>
 <li>自从上次drop掉一个表后 我就掉进了一个坑 好不容易爬出来了-。-</li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ python manage.py migrate –fake pay zero</span><br><span class="line">之后，删除当前app的migrations的文件，仅保留__init__.py</span><br><span class="line">并且要去当前app所属数据库的django_migrations里删除当前app的记录（忘记是不是必须的了）</span><br><span class="line">$ python manage.py makemigration app_name</span><br><span class="line">python manage.py migrate --databaese xxx_db –fake-inital </span><br><span class="line">问题的关键是 一定要--database 指明当前app的database</span><br><span class="line">不然 嗯 django_migrations的记录就是写在default数据库里 然后以后怎么migrate都没有用！！！</span><br></pre></td></tr></table></figure>
+<h4 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h4><ul>
+<li>web重启</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo /sbin/service httpd restart</span><br><span class="line"><span class="comment">#supervisorctl stop celery.worker &amp; supervisorctl stop celery.beat &amp; supervisorctl stop celery.celerycam</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#sudo /sbin/service httpd restart &amp; sudo supervisorctl restart all</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>celery 重启与停止</li>
+</ul>
+<p>停止celery_stop.sh<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">supervisorctl stop celery.worker &amp; supervisorctl stop celery.beat &amp; supervisorctl stop celery.celerycam</span><br></pre></td></tr></table></figure></p>
+<p>重启celery_restart.sh<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">supervisorctl restart celery.worker &amp; supervisorctl restart celery.beat &amp; supervisorctl restart celery.celerycam</span><br></pre></td></tr></table></figure></p>
+<h4 id="新"><a href="#新" class="headerlink" title="新"></a>新</h4><ul>
+<li>创建docker image,进入container</li>
+</ul>
+<p>#查看正在运行的container<code>docker ps</code> 查看所有container<code>docker ps -a</code></p>
+<p>Dockerfile<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">FROM python:3.6</span><br><span class="line">ENV PYTHONUNBUFFERED 1</span><br><span class="line"></span><br><span class="line">RUN mkdir /webapps</span><br><span class="line">WORKDIR /webapps</span><br><span class="line">#Installing OS Dependencies</span><br><span class="line">RUN apt-get update &amp;&amp; apt-get upgrade -y &amp;&amp; apt-get install -y \</span><br><span class="line">libsqlite3-dev</span><br><span class="line"></span><br><span class="line">RUN pip install -U pip setuptools</span><br><span class="line"></span><br><span class="line">COPY requirements.txt /webapps/</span><br><span class="line">#COPY requirements-opt.txt /webapps/</span><br><span class="line"></span><br><span class="line">RUN pip install -r /webapps/requirements.txt</span><br><span class="line">#RUN pip install -r /webapps/requirements-opt.txt</span><br><span class="line"></span><br><span class="line">ADD . /webapps/</span><br><span class="line">#Django service</span><br><span class="line">EXPOSE 8000</span><br></pre></td></tr></table></figure></p>
+<p>requirements.txt<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Django==1.11.8</span><br></pre></td></tr></table></figure></p>
+<p>构建django的image: <code>docker build -t my-django:v1 .</code></p>
+<p>#.表示当前目录下的Dockerfile<br>进入continer： <code>docker rn -it --rm my-django:v1 bash</code></p>
+<ul>
+<li>创建Django项目</li>
+</ul>
+<ol>
+<li><p>新建一个 django project<br><code>django-admin.py startproject project_name</code></p>
+</li>
+<li><p>新建一个app<br><code>python manage.py startapp app_name</code><br>把我们新定义的app加到settings.py中的INSTALL_APPS中</p>
+</li>
+</ol>
+
       
 
       
@@ -222,6 +270,15 @@
 
   
 <nav id="article-nav">
+  
+    <a href="/2018/06/21/Spark/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          Spark
+        
+      </div>
+    </a>
   
   
     <a href="/2018/06/20/Mysql/" id="article-nav-older" class="article-nav-link-wrap">
@@ -268,7 +325,7 @@
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2018 Jiayin Li
+    		&copy; 2019 Jiayin Li
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
